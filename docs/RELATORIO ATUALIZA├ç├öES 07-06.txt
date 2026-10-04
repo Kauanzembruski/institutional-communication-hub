@@ -1,0 +1,513 @@
+Relatório de Alterações Realizadas
+Data: 07/06/2026
+1. Painel Administrativo
+Atualização da Interface
+Foi realizada a atualização da interface administrativa para adequação às novas versões disponibilizadas pela equipe de frontend.
+Arquivo Atualizado
+painel.html
+Alterações Realizadas
+Atualização do layout conforme novo padrão visual.
+
+
+
+2. Módulo de Cardápio
+Foi realizada uma revisão completa do fluxo de gerenciamento do cardápio semanal, simplificando a operação e reduzindo possíveis inconsistências.
+
+Alterações nas Views
+Simplificação da Estrutura
+Foi removida a lógica de criação dinâmica de registros de cardápio.
+Novo Fluxo
+O sistema passou a trabalhar apenas com atualização dos registros existentes.
+Tratamento de Campos Vazios
+Foi implementada uma regra para preenchimento automático quando o campo de lanche for enviado vazio.
+Comportamento:
+Campo vazio → "-"
+Isso garante que a exibição pública nunca apresente campos em branco.
+Atualização da Interface
+Ajustes realizados nas respostas das requisições AJAX para atualização imediata da tabela sem necessidade de recarregar a página.
+
+Alterações nas URLs
+Rotas Removidas
+Foi removida a rota responsável pela criação de novos registros de cardápio.
+Rotas Mantidas
+Visualização do cardápio.
+Edição dos registros existentes.
+
+Benefícios Obtidos
+Maior controle sobre os dias exibidos.
+Redução da complexidade da interface administrativa.
+Prevenção de inconsistências causadas pela criação ou exclusão de dias da semana.
+Melhor experiência para os usuários responsáveis pela manutenção do cardápio.
+Padronização dos dados exibidos na tela pública.
+
+3. Padronização do Ícone do Sistema
+Foi realizada a inclusão do favicon institucional em todas as páginas administrativas.
+
+Implementação
+Trecho adicionado aos templates:
+<link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+
+Objetivos
+Padronização visual do sistema.
+Melhor identificação da aplicação nas abas do navegador.
+Fortalecimento da identidade visual institucional.
+
+Módulos Impactados
+A implementação foi realizada em todas as páginas administrativas atualizadas durante esta etapa do projeto.
+
+4. Módulo de Datas Importantes
+Foi realizada a atualização completa da página administrativa de Datas Importantes para adequação à versão mais recente disponibilizada pela equipe de frontend.
+
+Atualização da Interface
+Arquivo Atualizado
+datasimportadm.html
+Alterações Realizadas
+Atualização do layout conforme novo padrão visual.
+
+Benefícios Obtidos
+Interface mais moderna e consistente.
+Melhor experiência de utilização pelos administradores.
+Maior uniformidade visual entre os módulos do sistema.
+Facilidade na manutenção futura do frontend.
+
+
+
+
+5. Avisos Institucionais
+Banco de Dados
+Remoção da coluna mensagem
+Foi realizada a exclusão da coluna mensagem da tabela avisos, pois o campo deixou de ser utilizado pela aplicação.
+Impactos da alteração
+Após a remoção da coluna, foram realizados ajustes em:
+Model (Aviso)
+Views relacionadas aos avisos
+URLs relacionadas aos avisos
+Templates HTML
+Todas as referências ao campo removido foram eliminadas para evitar erros de consulta e renderização.
+
+Front-end
+Atualização do template administrativo
+Arquivo atualizado:
+avisoinstadm.html
+
+Alterações:
+Ajuste de layout conforme nova versão do front-end.
+
+
+Pesquisa
+Nova funcionalidade adicionada
+Foi implementada pesquisa avançada através da edição da view.
+Filtros disponíveis:
+Título do aviso
+Data inicial
+Data final
+Funcionamento:
+Pesquisa por título utilizando busca parcial (icontains).
+Data inicial retorna registros a partir da data selecionada.
+Data final limita os resultados até a data informada.
+Os filtros podem ser utilizados simultaneamente.
+
+6. Achados e Perdidos
+Front-end
+Atualização do template administrativo
+Arquivo atualizado:
+achadoseperdidos.html
+
+Alterações:
+Aplicação da nova versão visual do front-end.
+Ajustes de layout.
+Padronização visual com os demais módulos administrativos.
+
+Pesquisa
+Nova funcionalidade adicionada
+Implementação de pesquisa por nome do item.
+Funcionamento:
+Busca parcial utilizando:
+nome__icontains
+
+Exemplos:
+Pesquisa por:
+mochila
+
+Retorna:
+Mochila preta
+Mochila azul
+Mochila Adidas
+
+
+7. Informações Operacionais
+Front-end
+Atualização do template administrativo
+Arquivo atualizado:
+infoopadm.html
+
+Alterações:
+Aplicação da versão mais recente do layout.
+Padronização visual com os demais módulos administrativos.
+Ajustes em cards, modais e área de pesquisa.
+
+Pesquisa
+Nova funcionalidade adicionada
+Implementação de filtros administrativos.
+Filtros disponíveis:
+Título
+Data de lançamento
+Categoria
+Funcionamento:
+Título
+Busca parcial:
+titulo__icontains
+
+
+Data
+Busca por registros iguais ou posteriores à data selecionada:
+data_lancamento__gte
+
+Exemplo:
+Pesquisa:
+10/06/2026
+
+Retorna:
+10/06/2026
+11/06/2026
+12/06/2026
+...
+
+
+Categoria
+Filtro exato:
+categoria=categoria
+
+Categorias disponíveis:
+Ensino
+Pesquisa
+Extensão
+
+8. Próximas Aulas
+Situação Atual
+Nenhuma alteração realizada.
+O módulo permaneceu inalterado durante esta atualização.
+
+9. Calendário de Provas
+Front-end
+Atualização do template administrativo
+Arquivo atualizado:
+calendarioprovaadm.html
+
+Alterações:
+Aplicação da versão mais recente do layout fornecido pelo front-end.
+
+Pesquisa
+Nova funcionalidade adicionada
+Implementação de filtros administrativos.
+Filtros disponíveis:
+Disciplina
+Data
+Curso
+
+Disciplina
+Busca parcial:
+disciplina__icontains
+
+Exemplo:
+Pesquisa:
+Matemática
+
+Retorna:
+Matemática I
+Matemática II
+Matemática Financeira
+
+
+Data
+Busca por registros iguais ou posteriores à data selecionada:
+data__gte
+
+Exemplo:
+Pesquisa:
+15/06/2026
+
+Retorna todas as provas a partir dessa data.
+
+Curso
+Filtro exato:
+curso=curso
+
+Cursos disponíveis:
+TII
+ADM
+ADS
+TPG
+
+Ajustes na funcionalidade de edição
+A view de edição foi atualizada para permitir:
+Antes
+Alteração apenas da disciplina.
+Alteração apenas da data.
+Depois
+Alteração da disciplina.
+Alteração da data.
+Alteração do curso.
+Alteração da turma.
+
+Validação de Datas
+Mantida a regra:
+Não permitir cadastro ou edição com datas anteriores à data atual.
+
+Validação aplicada em:
+Criação de provas
+Edição de provas
+
+10. Módulo de Lembretes
+Foi realizada a atualização do módulo de Lembretes para adequação à versão final disponibilizada pelo frontend, além de ajustes funcionais na camada de backend e no template administrativo.
+
+Front-end
+Arquivo Atualizado
+lembretesadm.html
+
+Alterações Realizadas
+Atualização do template para a versão final do frontend.
+Ajustes visuais conforme novo padrão administrativo.
+Adequação da estrutura dos cards de lembretes.
+Ajustes nos modais de criação, edição e exclusão.
+Adaptação da exibição da data associada ao lembrete.
+Melhorias de usabilidade nas ações administrativas.
+
+Funcionalidades
+Pesquisa
+Foi adicionada a funcionalidade de pesquisa no módulo de Lembretes.
+Filtros implementados:
+Título do lembrete
+Data do lembrete
+Funcionamento:
+A pesquisa por título utiliza busca parcial.
+A pesquisa por data retorna os lembretes a partir da data selecionada.
+Os filtros podem ser utilizados individualmente ou em conjunto.
+
+Back-end
+Alterações nas Views
+Foram realizados ajustes nas views para suportar:
+Listagem com filtros de pesquisa.
+Criação de lembretes via requisição assíncrona.
+Edição do conteúdo do lembrete.
+Edição da data do lembrete.
+Exclusão de lembretes.
+Validação para impedir cadastro ou edição com datas anteriores à data atual.
+
+Benefícios Obtidos
+Interface atualizada e alinhada ao padrão final do frontend.
+Melhor controle sobre os lembretes cadastrados.
+Pesquisa mais eficiente dentro do painel administrativo.
+Redução de erros relacionados a datas inválidas.
+Melhor experiência para usuários administrativos.
+
+11. Módulo de Eventos
+Foi realizada uma reestruturação do módulo de Eventos, incluindo alterações no banco de dados, model, views, URLs e template administrativo.
+
+Banco de Dados
+alteração da Tabela eventos
+Foi alterada a tabela responsável por armazenar os registros de eventos.
+CREATE TABLE eventos (
+
+    id_evento SERIAL PRIMARY KEY,
+
+    titulo VARCHAR(150) NOT NULL,
+
+    descricao TEXT NOT NULL,
+
+    data_inicio DATE NOT NULL,
+
+    data_fim DATE NOT NULL,
+
+    hora_inicio TIME NOT NULL,
+
+    hora_fim TIME NOT NULL,
+
+    imagem VARCHAR(255),
+
+
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
+
+
+Model
+Arquivo Atualizado
+models.py
+
+Alterações Realizadas
+Criação ou atualização do model de Eventos.
+Adequação dos campos do model à estrutura da tabela eventos.
+Inclusão dos campos de data e horário.
+Inclusão do campo de imagem.
+Padronização do identificador principal id_evento.
+
+Views
+Arquivo Atualizado
+views.py
+
+Alterações Realizadas
+Foram ajustadas as views responsáveis por:
+Listagem pública dos eventos.
+Listagem administrativa dos eventos.
+Criação de novos eventos.
+Edição de eventos existentes.
+Exclusão de eventos.
+Retorno de dados em formato JSON quando necessário.
+
+URLs
+Arquivo Atualizado
+urls.py
+
+Rotas Ajustadas
+Foram configuradas rotas para:
+Tela administrativa de eventos.
+Tela pública de eventos.
+Listagem de eventos.
+Criação de evento.
+Edição de evento.
+Exclusão de evento.
+
+Template
+Arquivo Atualizado
+eventosadm.html
+
+Alterações Realizadas
+Aplicação do template administrativo de eventos, ultima versão do front
+
+Funcionalidades
+Criação de Eventos
+Permite cadastrar eventos informando:
+Título
+Descrição
+Data de início
+Data de fim
+Horário de início
+Horário de fim
+Imagem
+
+Edição de Eventos
+Permite atualizar as informações principais de um evento já cadastrado.
+
+Exclusão de Eventos
+Permite remover eventos cadastrados no sistema.
+
+Identificação de Eventos Passados
+Eventos cuja data final já passou são identificados visualmente na interface administrativa.
+
+Validações Implementadas
+Foram adicionadas validações para impedir:
+Cadastro de eventos com data inicial anterior à data atual.
+Cadastro de evento com data final menor que a data inicial.
+Cadastro de evento com horário final menor ou igual ao horário inicial quando as datas forem iguais.
+
+
+
+
+Síntese Geral da Etapa
+Esta etapa teve como foco principal a modernização da área administrativa do sistema, contemplando atualização visual, melhorias funcionais e adequação estrutural do backend.
+Principais Entregas
+Atualização de Front-end
+Foram atualizados os módulos:
+Painel Administrativo
+Cardápio
+Datas Importantes
+Avisos Institucionais
+Achados e Perdidos
+Informações Operacionais
+Calendário de Provas
+Lembretes
+Eventos
+Todos os módulos passaram a seguir o padrão visual mais recente disponibilizado pela equipe de frontend.
+
+Implementação de Pesquisas Administrativas
+Foram adicionadas funcionalidades de pesquisa nos módulos:
+Avisos Institucionais
+Achados e Perdidos
+Informações Operacionais
+Calendário de Provas
+Lembretes
+Os filtros implementados permitem buscas por texto, datas e categorias específicas, conforme a necessidade de cada módulo.
+
+Reestruturação de Regras de Negócio
+Foram revisadas regras relacionadas a:
+Cardápio semanal
+Cadastro de provas
+Cadastro de lembretes
+Cadastro de eventos
+Incluindo validações para impedir registros com datas inválidas ou inconsistentes.
+
+Evolução do Módulo de Eventos
+O módulo de Eventos recebeu a maior atualização estrutural desta etapa, envolvendo:
+Alteração da tabela no banco de dados.
+Atualização do model.
+Atualização das views.
+Atualização das URLs.
+Atualização completa do template administrativo.
+Inclusão de controle de período do evento.
+Inclusão de horários de início e fim.
+Inclusão de imagens.
+Implementação de validações de datas e horários.
+
+Padronização do Sistema
+Também foi realizada a padronização visual por meio da inclusão do favicon institucional em todos os módulos administrativos atualizados.
+
+Resumo Executivo
+Módulos Atualizados:
+✔ Painel Administrativo
+✔ Cardápio
+✔ Datas Importantes
+✔ Avisos Institucionais
+✔ Achados e Perdidos
+✔ Informações Operacionais
+✔ Calendário de Provas
+✔ Lembretes
+✔ Eventos
+Principais Resultados:
+✔ Atualização completa dos templates administrativos
+✔ Inclusão de mecanismos de pesquisa em múltiplos módulos
+✔ Simplificação de regras de negócio do Cardápio
+✔ Reestruturação da tabela de Eventos
+✔ Remoção de campos obsoletos da base de dados
+✔ Implementação de validações de datas e horários
+✔ Padronização visual do sistema
+✔ Maior consistência entre frontend, backend e banco de dados
+A etapa concluiu a adequação do sistema à versão mais recente do frontend, garantindo maior usabilidade, padronização visual e estabilidade operacional.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

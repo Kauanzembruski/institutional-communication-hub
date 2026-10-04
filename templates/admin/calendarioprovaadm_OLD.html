@@ -1,0 +1,554 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+<meta charset="UTF-8">
+<title>Calendário ADM</title>
+<link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#ffffff;
+}
+
+nav{
+    background:#929292;
+    padding:15px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.pesquisa{
+    width:300px;
+    padding:10px;
+    border:none;
+    border-radius:8px;
+}
+
+.login{
+    width:40px;
+}
+
+h1{
+    margin-left:20px;
+    color:#000000;
+}
+
+main{
+    display:flex;
+    align-items:flex-start;
+    gap:20px;
+    padding:20px;
+}
+
+.conteudo{
+    width:70%;
+}
+
+aside{
+    width:250px;
+    background:#ccc;
+    padding:20px;
+    border-radius:12px;
+    position:sticky;
+    top:20px;
+    margin-left:auto;
+}
+
+aside input,
+aside button{
+    width:100%;
+    padding:10px;
+    box-sizing:border-box;
+}
+
+.calendarioprovaadm{
+    background:#eee;
+    width:100%;
+    margin:15px 0;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.info{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.info label{
+    font-size:18px;
+}
+
+.btn-add{
+    position:fixed;
+    right:25px;
+    bottom:25px;
+    width:65px;
+    height:65px;
+    border:none;
+    border-radius:50%;
+    background:#2f3e9e;
+    color:white;
+    font-size:35px;
+    cursor:pointer;
+}
+
+.modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.5);
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+}
+
+.modal-conteudo{
+    background:white;
+    width:350px;
+    padding:25px;
+    border-radius:12px;
+    position:relative;
+}
+
+.modal-conteudo form{
+    display:flex;
+    flex-direction:column;
+}
+
+.modal-conteudo input,
+.modal-conteudo select,
+.modal-conteudo button{
+    margin-top:10px;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+.modal-conteudo button{
+    background:#2f3e9e;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+.fechar{
+    position:absolute;
+    top:10px;
+    right:15px;
+    font-size:25px;
+    cursor:pointer;
+}
+
+.excluir{
+    background:#d62828 !important;
+}
+
+small{
+    color:#555;
+    font-size:14px;
+}
+
+.modal-mensagem{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.caixa-mensagem{
+    background:white;
+    padding:30px;
+    border-radius:16px;
+    width:90%;
+    max-width:400px;
+    text-align:center;
+}
+
+.caixa-mensagem .success{
+    color:#1b4332;
+}
+
+.caixa-mensagem .error{
+    color:#b00020;
+}
+
+.caixa-mensagem button{
+    background:#2f3e9e;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:10px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<nav>
+<a href="{% url 'painel' %}">Voltar</a>
+
+<input class="pesquisa" type="text" placeholder="Pesquise aqui...">
+
+<img class="login" src="{% static 'img/login.png' %}" alt="Usuário">
+</nav>
+</header>
+
+<main>
+
+<section class="conteudo">
+
+{% regroup provas by curso as provas_por_curso %}
+
+{% for grupo in provas_por_curso %}
+
+<h1>Curso {{ grupo.grouper }}</h1>
+
+{% for prova in grupo.list %}
+
+<article class="calendarioprovaadm">
+
+    <section class="info">
+
+        <input
+        type="radio"
+        onclick="abrirEdicao(
+            '{{ prova.id }}',
+            '{{ prova.curso|escapejs }}',
+            '{{ prova.turma|escapejs }}',
+            '{{ prova.disciplina|escapejs }}',
+            '{{ prova.data|date:"Y-m-d" }}'
+        )">
+
+        <label>
+            {{ prova.disciplina }}
+            <br>
+            <small>{{ prova.turma }}</small>
+        </label>
+
+    </section>
+
+    <p>{{ prova.data|date:"d/m/Y" }}</p>
+
+</article>
+
+{% endfor %}
+
+{% empty %}
+
+<h3>Nenhuma prova cadastrada.</h3>
+
+{% endfor %}
+
+</section>
+
+<aside>
+
+<h3>Pesquisa avançada</h3>
+
+<form method="GET" action="{% url 'calendario' %}">
+
+<input
+type="text"
+name="curso"
+placeholder="Curso"
+value="{{ curso|default:'' }}">
+
+<br><br>
+<input
+type="text"
+name="disciplina"
+placeholder="Disciplina"
+value="{{ disciplina|default:'' }}">
+
+<br><br>
+
+<input
+type="date"
+name="data"
+value="{{ data|default:'' }}">
+
+<br><br>
+
+<button type="submit">
+Pesquisar
+</button>
+
+</form>
+
+<br>
+
+<a href="{% url 'calendario' %}">
+<button type="button">
+Limpar
+</button>
+</a>
+
+</aside>
+
+</main>
+
+<button class="btn-add" onclick="abrirModal()">+</button>
+
+<section id="modal" class="modal">
+
+<article class="modal-conteudo">
+
+<span class="fechar" onclick="fecharModal()">&times;</span>
+
+<h2>Nova Prova</h2>
+
+<form method="POST" action="{% url 'criar_prova' %}">
+
+{% csrf_token %}
+
+<label>Curso</label>
+
+<select id="curso" name="curso" onchange="atualizarTurmas()">
+<option>TII</option>
+<option>ADM</option>
+<option>ADS</option>
+<option>TPG</option>
+</select>
+
+<label>Disciplina</label>
+
+<input type="text" id="disciplina" name="disciplina" required>
+
+<label>Turma</label>
+
+<select id="turma" name="turma"></select>
+
+<label>Data</label>
+
+<input type="date" id="data" name="data" min="{{ hoje }}" required>
+
+<button type="submit">
+Salvar
+</button>
+
+</form>
+
+</article>
+
+</section>
+
+<section id="editarModal" class="modal">
+
+<article class="modal-conteudo">
+
+<span class="fechar" onclick="fecharEdicao()">&times;</span>
+
+<h2>Editar Prova</h2>
+
+<form method="POST" id="formEditar">
+
+{% csrf_token %}
+
+<label>Curso</label>
+
+<select id="editarCurso" name="curso" onchange="atualizarTurmasEdicao()">
+<option>TII</option>
+<option>ADM</option>
+<option>ADS</option>
+<option>TPG</option>
+</select>
+
+<label>Turma</label>
+
+<select id="editarTurma" name="turma"></select>
+
+<label>Disciplina</label>
+
+<input type="text" id="editarDisciplina" name="disciplina" required>
+
+<label>Data</label>
+
+<input type="date" id="editarData" name="data" min="{{ hoje }}" required>
+
+<button type="submit">
+Salvar Alterações
+</button>
+
+<button type="button" class="excluir" onclick="excluirProva()">
+Excluir Prova
+</button>
+
+</form>
+
+</article>
+
+</section>
+
+<script>
+const turmasPorCurso = {
+    TII: [
+        "1° TII",
+        "2° TII",
+        "3° TII"
+    ],
+
+    ADM: [
+        "1° ADM A",
+        "1° ADM B",
+        "2° ADM A",
+        "2° ADM B",
+        "3° ADM A",
+        "3° ADM B"
+    ],
+
+    ADS: [
+        "1° Sem ADS",
+        "2° Sem ADS",
+        "3° Sem ADS",
+        "4° Sem ADS",
+        "5° Sem ADS",
+        "6° Sem ADS"
+    ],
+
+    TPG: [
+        "1° Sem TPG",
+        "2° Sem TPG",
+        "3° Sem TPG",
+        "4° Sem TPG",
+        "5° Sem TPG",
+        "6° Sem TPG"
+    ]
+};
+
+let idEditando = null;
+
+function atualizarTurmas() {
+    let curso = document.getElementById("curso").value;
+    let turma = document.getElementById("turma");
+
+    turma.innerHTML = "";
+
+    turmasPorCurso[curso].forEach(item => {
+        let option = document.createElement("option");
+        option.value = item;
+        option.innerText = item;
+        turma.appendChild(option);
+    });
+}
+
+function atualizarTurmasEdicao() {
+    let curso = document.getElementById("editarCurso").value;
+    let turma = document.getElementById("editarTurma");
+
+    turma.innerHTML = "";
+
+    turmasPorCurso[curso].forEach(item => {
+        let option = document.createElement("option");
+        option.value = item;
+        option.innerText = item;
+        turma.appendChild(option);
+    });
+}
+
+function abrirModal() {
+    atualizarTurmas();
+    document.getElementById("modal").style.display = "flex";
+}
+
+function fecharModal() {
+    document.getElementById("modal").style.display = "none";
+}
+
+function abrirEdicao(id, curso, turma, disciplina, data) {
+    idEditando = id;
+
+    document.getElementById("editarCurso").value = curso;
+
+    atualizarTurmasEdicao();
+
+    document.getElementById("editarTurma").value = turma;
+    document.getElementById("editarDisciplina").value = disciplina;
+    document.getElementById("editarData").value = data;
+
+    document.getElementById("formEditar").action =
+        `/provas/editar/${id}/`;
+
+    document.getElementById("editarModal").style.display = "flex";
+}
+
+function fecharEdicao() {
+    document.getElementById("editarModal").style.display = "none";
+}
+
+function excluirProva() {
+    if (!idEditando) return;
+
+    window.location.href = `/provas/excluir/${idEditando}/`;
+}
+
+function fecharMensagem() {
+    document.getElementById("modalMensagem").style.display = "none";
+}
+
+window.onclick = function(event) {
+    let modal = document.getElementById("modal");
+    let editar = document.getElementById("editarModal");
+
+    if (event.target == modal) {
+        fecharModal();
+    }
+
+    if (event.target == editar) {
+        fecharEdicao();
+    }
+};
+
+atualizarTurmas();
+atualizarTurmasEdicao();
+</script>
+
+{% if messages %}
+
+<div id="modalMensagem" class="modal-mensagem">
+
+<div class="caixa-mensagem">
+
+{% for message in messages %}
+
+<h3 class="{{ message.tags }}">
+{{ message }}
+</h3>
+
+{% endfor %}
+
+<button onclick="fecharMensagem()">
+OK
+</button>
+
+</div>
+
+</div>
+
+{% endif %}
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+rotas publicas
+
+cardapio:
+    http://127.0.0.1:8000/cardapio/cardapioPublico/
+
+
+proxcimas auls:
+    TII: http://127.0.0.1:8000/pxaulas/proximas-aulas/TII/
+    ADS: http://127.0.0.1:8000/pxaulas/proximas-aulas/ADS/
+    TPG: http://127.0.0.1:8000/pxaulas/proximas-aulas/TPG/
+    ADM: http://127.0.0.1:8000/pxaulas/proximas-aulas/ADM/
+
+Calendario de provAS:
+    http://127.0.0.1:8000/provas/calendarioPublico/
+
+Lembrete:
+    http://127.0.0.1:8000/lembretePublico/
+
+Eventos:
+    http://127.0.0.1:8000/eventos/eventosPublico/
+
+Achados e perdidos:
+    http://127.0.0.1:8000/achadoseperdidos/achadosPublico/
+
+Informações operacionais:
+    http://127.0.0.1:8000/infoop/infoopPublico/
+
+
+
+SENHA ADMIN
+
+admin@email.com
+PREENCHER_LOCALMENTE

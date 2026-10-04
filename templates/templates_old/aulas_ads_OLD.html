@@ -1,0 +1,455 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Próximas Aulas - ADS</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #e6e6e6;
+        }
+
+        main {
+            width: 95%;
+            height: calc(100vh - 40px);
+            margin: 20px auto;
+            background: #f5f5f5;
+            padding: 18px;
+            position: relative;
+        }
+
+        /* CABEÇALHO */
+
+        .header {
+            background: #142a78;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .logo {
+            position: absolute;
+            left: 20px;
+            height: 35px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 30px;
+            font-weight: 900;
+        }
+
+        /* CURSO */
+
+        .curso {
+            text-align: center;
+            margin: 30px 0 40px;
+            font-size: 26px;
+            font-weight: 900;
+            color: #222;
+        }
+
+        /* GRID */
+
+        .grid {
+            width: 70%;
+            max-width: 900px;
+            margin: auto;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 18px;
+        }
+
+        /* CARD */
+
+        .card {
+            display: flex;
+            height: 72px;
+            border: 2px solid #142a78;
+            background: white;
+        }
+
+        /* TURMA */
+
+        .turma {
+            width: 110px;
+            background: #071f62;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 24px;
+            font-weight: bold;
+
+            clip-path: polygon(0 0,
+                    100% 0,
+                    72% 100%,
+                    0 100%);
+
+            flex-shrink: 0;
+        }
+
+        /* DISCIPLINA */
+
+        .disciplina {
+            flex: 1;
+
+            display: flex;
+            align-items: center;
+
+            padding-left: 25px;
+
+            font-size: 18px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        /* SALA */
+
+        .sala {
+            width: 120px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 18px;
+            font-weight: bold;
+            color: #222;
+
+            flex-shrink: 0;
+        }
+
+        /* VAZIO */
+
+        .vazio {
+            text-align: center;
+            color: #222;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* FOOTER */
+
+        footer {
+            position: absolute;
+            left: 18px;
+            right: 18px;
+            bottom: 45px;
+
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .info {
+            width: 115px;
+            height: 32px;
+            border: 2px solid #142a78;
+            color: #142a78;
+            border-radius: 4px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: bold;
+        }
+
+        /* AVISOS */
+
+        .marquee {
+            flex: 1;
+            height: 32px;
+            background: #142a78;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+            position: relative;
+        }
+
+        .marquee p {
+            position: absolute;
+            white-space: nowrap;
+
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
+
+            animation: rolar 30s linear infinite;
+        }
+
+        @keyframes rolar {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* RESPONSIVO */
+
+        @media(max-width:768px) {
+
+            html,
+            body {
+                overflow: auto;
+            }
+
+            main {
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                margin: 0;
+                padding-bottom: 120px;
+            }
+
+            .grid,
+            .grid.duas-colunas {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .curso {
+                font-size: 18px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            footer {
+                position: fixed;
+                left: 15px;
+                right: 15px;
+                bottom: 15px;
+                width: auto;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .info,
+            .marquee {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+
+        <div class="header">
+
+            <img src="{% static 'img/logoif.png.png' %}" alt="Logo IFRS" class="logo">
+
+            <h1>PRÓXIMAS AULAS</h1>
+
+        </div>
+
+        <div class="curso">
+            ANÁLISE E DESENVOLVIMENTO DE SISTEMAS
+        </div>
+
+        <div class="grid" id="tabelaAulas"></div>
+
+        <footer>
+
+            <div class="info">
+                <span id="hora"></span>
+                &nbsp;|&nbsp;
+                <span id="temperatura">20°</span>
+            </div>
+
+            <div class="marquee">
+
+                <p>
+                    {% for aviso in avisos %}
+
+                    {{ aviso.titulo_aviso }}
+
+                    {% if not forloop.last %}
+                    • • •
+                    {% endif %}
+
+                    {% empty %}
+
+                    *AVISOS INSTITUCIONAIS
+
+                    {% endfor %}
+                </p>
+
+            </div>
+
+        </footer>
+
+    </main>
+
+<script>
+async function carregarAulas() {
+
+    try {
+
+        const resposta = await fetch(
+            "/pxaulas/api/proximas-aulas/ADS/"
+        );
+
+        if (!resposta.ok) {
+            throw new Error(
+                `Erro HTTP: ${resposta.status}`
+            );
+        }
+
+        const retorno = await resposta.json();
+
+        console.log("Resposta API:", retorno);
+
+        document.getElementById(
+            "proximoHorario"
+        ).textContent = retorno.horario ?? "";
+
+        const tabela =
+            document.getElementById("tabelaAulas");
+
+        tabela.innerHTML = "";
+
+
+        if (
+            !retorno.dados ||
+            retorno.dados.length === 0
+        ) {
+
+            tabela.classList.remove(
+                "duas-colunas"
+            );
+
+            tabela.innerHTML = `
+                <div class="vazio">
+                    Nenhuma próxima aula encontrada.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        retorno.dados.sort((a, b) =>
+            String(a.turma).localeCompare(
+                String(b.turma),
+                "pt-BR",
+                {
+                    numeric: true,
+                    sensitivity: "base"
+                }
+            )
+        );
+
+
+        const possuiTurmaB =
+            retorno.dados.some(item =>
+                String(item.turma || "")
+                    .toUpperCase()
+                    .includes("B")
+            );
+
+
+        if (possuiTurmaB) {
+
+            tabela.classList.add(
+                "duas-colunas"
+            );
+
+        } else {
+
+            tabela.classList.remove(
+                "duas-colunas"
+            );
+
+        }
+
+
+retorno.dados.forEach(item => {
+
+    const numero = String(item.turma)
+        .replace(/[AB]/gi, "")
+        .replace(/\D/g, "")
+        .trim();
+
+    tabela.innerHTML += `
+        <article class="turma">
+
+            <h3>${numero}</h3>
+
+            <p class="aula">
+                ${item.materia}
+            </p>
+
+            <p class="sala">
+                ${item.sala}
+            </p>
+
+        </article>
+    `;
+});
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar aulas:",
+            erro
+        );
+
+        document.getElementById(
+            "tabelaAulas"
+        ).innerHTML = `
+
+            <div class="vazio">
+                Erro ao carregar as próximas aulas.
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+carregarAulas();
+
+setInterval(
+    carregarAulas,
+    60000
+);
+</script>
+
+</body>
+
+</html>

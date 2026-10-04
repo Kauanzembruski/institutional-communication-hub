@@ -1,0 +1,381 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datas Importantes</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #e6e6e6;
+        }
+
+        main {
+            width: 95%;
+            margin: 15px auto;
+            background: #f7f7f7;
+            padding: 18px;
+
+            min-height: calc(100vh - 30px);
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 72px;
+            background: #419b94;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-radius: 4px;
+        }
+
+        .logo {
+            position: absolute;
+            left: 22px;
+            height: 42px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 34px;
+            font-weight: 900;
+        }
+
+        .periodo-texto {
+            text-align: center;
+            margin-top: 14px;
+            color: #419b94;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .semana {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .semana div {
+            border: 1px solid #419b94;
+            border-radius: 20px;
+            background: white;
+            padding: 7px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .calendario {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 14px 12px;
+            margin-top: 12px;
+        }
+
+        .dia {
+            width: 72px;
+            height: 56px;
+            margin: auto;
+            border: 1px solid #419b94;
+            border-radius: 30px;
+            background: white;
+            color: #419b94;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .dia:hover {
+            transform: scale(1.06);
+        }
+
+        .hoje {
+            background: #419b94;
+            color: white;
+        }
+
+        .data-importante {
+            background: #c12752;
+            color: white;
+            border: none;
+        }
+
+        .titulo-provas {
+            text-align: center;
+            margin: 26px 0 12px;
+            font-size: 26px;
+            font-weight: 900;
+            color: #222;
+        }
+
+        .tabela-head,
+        .linha-prova {
+            display: grid;
+            grid-template-columns: 140px 190px 1fr;
+            gap: 18px;
+        }
+
+        .tabela-head {
+            margin-bottom: 8px;
+        }
+
+        .tabela-head div {
+            border: 1px solid #419b94;
+            border-radius: 20px;
+            background: white;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .linha-prova {
+            margin-bottom: 8px;
+        }
+
+        .linha-prova div {
+            min-height: 32px;
+            border: 1px solid #419b94;
+            border-radius: 5px;
+            background: white;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            font-weight: bold;
+        }
+
+        .sem-prova div {
+            color: #777;
+        }
+
+        footer {
+            margin-top: auto;
+
+            display: flex;
+            gap: 30px;
+            align-items: center;
+
+            padding-top: 20px;
+        }
+
+        .info {
+            width: 120px;
+            height: 36px;
+            border: 1px solid #419b94;
+            border-radius: 4px;
+            color: #419b94;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .marquee {
+            flex: 1;
+            height: 45px;
+            background: #419b94;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        .marquee p {
+            color: white;
+            font-size: 19px;
+            font-weight: bold;
+            white-space: nowrap;
+            animation: rolar 25s linear infinite;
+        }
+
+        @keyframes rolar {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(-100%);
+            }
+        }
+
+        @media(max-width:768px) {
+
+            .semana,
+            .calendario {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .tabela-head,
+            .linha-prova {
+                grid-template-columns: 1fr;
+            }
+
+            footer {
+                flex-direction: column;
+            }
+
+            .info {
+                width: 100%;
+            }
+        }
+
+        .numero {
+            font-size: 18px;
+            line-height: 18px;
+        }
+
+        .evento {
+            font-size: 8px;
+            line-height: 9px;
+            margin-top: 2px;
+            text-transform: uppercase;
+            max-width: 62px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+
+        <div class="header">
+            <img src="{% static 'img/logoif.png.png' %}" class="logo" alt="Logo IFRS">
+            <h1>DATAS IMPORTANTES</h1>
+        </div>
+
+        <div class="periodo-texto">
+            {% if quinzena == 1 %}
+            01 a 14/{{ mes }}/{{ ano }}
+            {% else %}
+            15 ao fim do mês - {{ mes }}/{{ ano }}
+            {% endif %}
+        </div>
+
+        <div class="semana">
+            <div>SEG</div>
+            <div>TER</div>
+            <div>QUA</div>
+            <div>QUI</div>
+            <div>SEX</div>
+            <div>SAB</div>
+            <div>DOM</div>
+        </div>
+
+        <div class="calendario">
+            {% for dia in dias_periodo %}
+            <div class="dia {% if dia.data == hoje %}hoje{% endif %} {% if dia.data_importante %}data-importante{% endif %}"
+                onclick="mostrarProvas('{{ dia.data }}')">
+                <span class="numero">{{ dia.numero }}</span>
+
+                {% if dia.data_importante %}
+                <span class="evento">
+                    {{ dia.data_importante.titulo }}
+                </span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="titulo-provas">
+            PROVAS DO PERÍODO
+        </div>
+
+        <div class="tabela-head">
+            <div>DATA</div>
+            <div>TURMA</div>
+            <div>DISCIPLINA</div>
+        </div>
+
+        <div id="painelProvas">
+            {% for prova in provas_periodo %}
+            <div class="linha-prova">
+                <div>{{ prova.data }}</div>
+                <div>{{ prova.turma }}</div>
+                <div>{{ prova.disciplina }}</div>
+            </div>
+            {% empty %}
+            <div class="linha-prova sem-prova">
+                <div>-</div>
+                <div>-</div>
+                <div>Nenhuma prova no período</div>
+            </div>
+            {% endfor %}
+        </div>
+
+
+    </main>
+
+    {{ provas_por_dia|json_script:"provas-json" }}
+
+    <script>
+        const provasPorDia = JSON.parse(
+            document.getElementById("provas-json").textContent
+        );
+
+        function criarLinha(prova) {
+            return `
+                <div class="linha-prova">
+                    <div>${prova.data}</div>
+                    <div>${prova.turma}</div>
+                    <div>${prova.disciplina}</div>
+                </div>
+            `;
+        }
+
+        function mostrarProvas(data) {
+            const painel = document.getElementById("painelProvas");
+
+            painel.innerHTML = "";
+
+            if (provasPorDia[data] && provasPorDia[data].length > 0) {
+                provasPorDia[data].forEach(prova => {
+                    painel.innerHTML += criarLinha(prova);
+                });
+            } else {
+                painel.innerHTML = `
+                    <div class="linha-prova sem-prova">
+                        <div>-</div>
+                        <div>-</div>
+                        <div>Nenhuma prova neste dia</div>
+                    </div>
+                `;
+            }
+        }
+
+        function atualizarHora() {
+            const agora = new Date();
+
+            document.getElementById("hora").innerHTML =
+                agora.toLocaleTimeString("pt-BR", {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+        }
+
+        setInterval(atualizarHora, 1000);
+        atualizarHora();
+    </script>
+
+</body>
+
+</html>

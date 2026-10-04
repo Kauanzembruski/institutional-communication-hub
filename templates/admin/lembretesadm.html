@@ -1,0 +1,521 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lembretes</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+    <style>
+        body {
+            font-family: Arial;
+            background: #ffffff;
+            margin: 0;
+        }
+
+        /* NAV */
+
+        nav {
+            background: #929292;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login {
+            width: 40px;
+        }
+
+        /* LAYOUT */
+
+        .pagina {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* ASIDE */
+
+        aside {
+            position: fixed;
+            right: 18px;
+            top: 92px;
+            width: 500px;
+            min-width: 500px;
+            background: #e9e9e9;
+            padding: 18px;
+            border-radius: 12px;
+            box-sizing: border-box;
+        }
+
+        aside h1 {
+            margin: 0 0 24px 0;
+            font-size: 30px;
+            white-space: nowrap;
+        }
+
+        aside form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        aside input,
+        aside button {
+            width: 100%;
+            height: 38px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        aside button {
+            background: #3949ab;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* container */
+
+        .container {
+            flex: 1;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(320px, 1fr));
+
+            gap: 20px;
+
+            align-items: start;
+
+            padding-right: 540px;
+
+            box-sizing: border-box;
+        }
+
+        /* card */
+
+        .lembrete-card {
+
+            display: flex;
+
+            gap: 20px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            padding: 15px;
+
+            background: #eee;
+
+            width: 420px;
+
+            box-sizing: border-box;
+
+            margin: 0;
+        }
+
+        .conteudo h1 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .conteudo p {
+
+            font-size: 13px;
+            color: #000000;
+        }
+
+        /* botão + */
+
+        .btn-add {
+            position: fixed;
+            bottom: 20px;
+            right: 22px;
+
+            font-size: 25px;
+            padding: 10px 15px;
+
+            cursor: pointer;
+            border: none;
+            border-radius: 50%;
+            width: 58px;
+            height: 58px;
+            padding: 0;
+
+            background: #a8aab5;
+            color: white;
+
+            z-index: 9999;
+        }
+
+        /* modal */
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-conteudo {
+            background: white;
+            padding: 20px;
+            width: 300px;
+            border-radius: 10px;
+        }
+
+        .modal-conteudo input,
+        .modal-conteudo textarea,
+        .modal-conteudo button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .fechar {
+            float: right;
+            cursor: pointer;
+        }
+
+        /* botão excluir */
+
+        .btn-excluir {
+            background: red;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        .conteudo h1 {
+            color: #000000;
+        }
+
+        aside label {
+            margin-top: 4px;
+        }
+
+        @media (max-width: 900px) {
+            aside {
+                position: static;
+                width: 100%;
+                min-width: 0;
+            }
+
+            .pagina {
+                flex-direction: column;
+            }
+
+            .container {
+                padding-right: 0;
+                width: 100%;
+            }
+
+            .lembrete-card {
+                width: 100%;
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+<header>
+    <nav class="inicial">
+        <a href="{% url 'painel' %}">Voltar</a>
+        <img class="login" src="{% static 'img/login.png' %}" alt="Usuário">
+    </nav>
+</header>
+
+<div class="pagina">
+
+    <aside>
+        <form method="GET" action="{% url 'lembretes' %}">
+            <h1>Pesquisa Avançada</h1>
+
+            <label>Título:</label>
+            <input
+                type="text"
+                name="titulo"
+                value="{{ titulo|default:'' }}"
+            >
+
+            <label>Data início:</label>
+            <input
+                type="date"
+                name="data_inicio"
+                value="{{ data_inicio|default:'' }}"
+            >
+
+            <label>Data final:</label>
+            <input
+                type="date"
+                name="data_fim"
+                value="{{ data_fim|default:'' }}"
+            >
+
+            <button type="submit">Pesquisar Lembrete</button>
+        </form>
+    </aside>
+
+    <div class="container" id="container">
+
+        {% for lembrete in lembretes %}
+
+        <div class="lembrete-card">
+
+            <input
+                type="radio"
+                name="lembrete"
+                onclick="abrirModalEditar(
+                    {{ lembrete.id_lembrete }},
+                    this,
+                    '{{ lembrete.data_expi|date:"Y-m-d" }}'
+                )"
+            >
+
+            <div class="conteudo">
+
+                <h1 id="titulo-data-{{ lembrete.id_lembrete }}">
+                    {{ lembrete.titulo_lembrete }} | {{ lembrete.data_expi|date:"d-m" }}
+                </h1>
+
+                <p id="texto-{{ lembrete.id_lembrete }}">
+                    {{ lembrete.conteudo_lembrete }}
+                </p>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- MODAL EDITAR -->
+<div id="modalEditar" class="modal">
+
+    <div class="modal-conteudo">
+
+        <h2>Editar lembrete</h2>
+
+        <label>Descrição</label>
+        <input type="text" id="inputEvento">
+
+        <label>Data</label>
+        <input type="date" id="editData">
+
+        <br><br>
+
+        <button onclick="salvarEvento()">Salvar</button>
+
+        <button class="btn-excluir" onclick="excluirEvento()">Excluir</button>
+
+        <button onclick="fecharModalEditar()">Cancelar</button>
+
+    </div>
+
+</div>
+
+<button class="btn-add" onclick="abrirModalAdd()">+</button>
+
+<!-- MODAL NOVO -->
+<div id="modalAdd" class="modal">
+
+    <div class="modal-conteudo">
+
+        <span class="fechar" onclick="fecharModalAdd()">&times;</span>
+
+        <h2>Novo Lembrete</h2>
+
+        <form onsubmit="criarLembrete(event)">
+
+            <label>Título</label>
+            <input type="text" id="titulo" required>
+
+            <label>Descrição</label>
+            <textarea id="descricao" required></textarea>
+
+            <label>Data</label>
+            <input type="date" id="data" required>
+
+            <br><br>
+
+            <button type="submit">Criar</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+    let diaSelecionado = null;
+    let cardAtual = null;
+
+    function abrirModalEditar(dia, elemento, data) {
+
+        diaSelecionado = dia;
+        cardAtual = elemento.parentElement;
+
+        let textoAtual =
+            document.getElementById("texto-" + dia).innerText;
+
+        document.getElementById("inputEvento").value = textoAtual;
+
+        document.getElementById("editData").value = data;
+
+        document.getElementById("editData").min =
+            new Date().toISOString().split("T")[0];
+
+        document.getElementById("modalEditar").style.display = "flex";
+    }
+
+    function fecharModalEditar() {
+        document.getElementById("modalEditar").style.display = "none";
+    }
+
+    function salvarEvento() {
+
+        let texto = document.getElementById("inputEvento").value;
+        let data = document.getElementById("editData").value;
+
+        fetch(`/lembretes/editar/${diaSelecionado}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            body: JSON.stringify({
+                descricao: texto,
+                data: data
+            })
+        })
+        .then(res => res.json())
+        .then(dataResposta => {
+
+            if (dataResposta.erro) {
+                alert(dataResposta.erro);
+                return;
+            }
+
+            document.getElementById("texto-" + diaSelecionado).innerText = texto;
+
+            fecharModalEditar();
+
+            location.reload();
+        });
+    }
+
+    function excluirEvento() {
+
+        fetch(`/lembretes/excluir/${diaSelecionado}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken")
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            if (cardAtual) {
+                cardAtual.remove();
+            }
+
+            fecharModalEditar();
+        });
+    }
+
+    function abrirModalAdd() {
+
+        document.getElementById("data").min =
+            new Date().toISOString().split("T")[0];
+
+        document.getElementById("modalAdd").style.display = "flex";
+    }
+
+    function fecharModalAdd() {
+        document.getElementById("modalAdd").style.display = "none";
+    }
+
+    function criarLembrete(event) {
+
+        event.preventDefault();
+
+        fetch("/lembretes/criar/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            body: JSON.stringify({
+                titulo: document.getElementById("titulo").value,
+                descricao: document.getElementById("descricao").value,
+                data: document.getElementById("data").value
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.erro) {
+                alert(data.erro);
+                return;
+            }
+
+            location.reload();
+        });
+    }
+
+    function getCookie(name) {
+
+        let cookieValue = null;
+
+        if (document.cookie && document.cookie !== '') {
+
+            let cookies = document.cookie.split(';');
+
+            for (let i = 0; i < cookies.length; i++) {
+
+                let cookie = cookies[i].trim();
+
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+
+                    cookieValue = decodeURIComponent(
+                        cookie.substring(name.length + 1)
+                    );
+
+                    break;
+                }
+            }
+        }
+
+        return cookieValue;
+    }
+</script>
+
+</body>
+</html>

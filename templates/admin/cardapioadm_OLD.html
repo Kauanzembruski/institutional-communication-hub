@@ -1,0 +1,283 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cardápio da Semana</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #ffffff;
+            text-align: center;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 60%;
+            background: #eee;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ccc;
+        }
+
+        tr:hover {
+            background: #eee;
+            cursor: pointer;
+        }
+
+        nav {
+            background: #929292;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .pesquisa {
+            width: 300px;
+            padding: 10px;
+            border: none;
+            border-radius: 1px;
+        }
+
+        .login {
+            width: 40px;
+        }
+
+        td[contenteditable="true"] {
+            background: white;
+        }
+
+        td[contenteditable="true"]:focus {
+            outline: 2px solid #666;
+        }
+
+        .btn-salvar {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            background: #666;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .btn-salvar:hover {
+            background: #555;
+        }
+
+
+        .lanche:empty::before {
+            content: "-";
+            color: #666;
+        }
+
+        .lanche:focus::before {
+            content: "";
+        }
+
+        .lanche.vazio::before {
+            content: "-";
+            color: #666;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    {% csrf_token %}
+    <header>
+        <nav class="inicial">
+            <a href="{% url 'painel' %}">Voltar</a>
+
+            <input class="pesquisa" type="text" placeholder="Pesquise aqui...">
+
+            <img class="login" src="{% static 'img/login.png' %}" alt="Usuário">
+        </nav>
+    </header>
+
+    <h1>Cardápio da Semana</h1>
+
+    <table id="tabela">
+        <thead>
+            <tr>
+                <th>Dia</th>
+                <th>Lanche</th>
+            </tr>
+        </thead>
+
+        <tbody id="corpo">
+            {% for item in cardapios %}
+            <tr data-id="{{ item.id_cardapio }}">
+                <td>{{ item.dia_semana }}</td>
+                <td contenteditable="true" class="lanche">
+                    {% if item.lanche and item.lanche != '-' %}{{ item.lanche }}{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button onclick="salvarCardapio()" class="btn-salvar">
+        Salvar Alterações
+    </button>
+
+    <script>
+async function salvarCardapio() {
+
+    const linhas =
+        document.querySelectorAll("#corpo tr");
+
+    const itens = [];
+
+
+    linhas.forEach(linha => {
+
+        const id =
+            linha.getAttribute("data-id");
+
+        let lanche =
+            linha.cells[1].innerText.trim();
+
+
+        if (lanche === "-") {
+            lanche = "";
+        }
+
+
+        itens.push({
+            id: id,
+            lanche: lanche
+        });
+
+    });
+
+
+    try {
+
+        const resposta = await fetch(
+            "{% url 'salvar_cardapio' %}",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json",
+
+                    "X-CSRFToken":
+                        getCookie("csrftoken")
+                },
+
+                body: JSON.stringify({
+                    itens: itens
+                })
+            }
+        );
+
+
+        const retorno =
+            await resposta.json();
+
+
+        if (!resposta.ok) {
+
+            console.error(
+                "Erro retornado:",
+                retorno
+            );
+
+            alert(
+                retorno.erro ||
+                "Erro ao salvar o cardápio."
+            );
+
+            return;
+        }
+
+
+        alert(
+            "Cardápio salvo com sucesso!"
+        );
+
+        console.log(
+            "Cardápio salvo:",
+            retorno
+        );
+
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao salvar:",
+            erro
+        );
+
+        alert(
+            "Erro de comunicação com o servidor."
+        );
+
+    }
+
+}
+        function getCookie(name) {
+            let cookieValue = null;
+
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+
+                    if (cookie.substring(0, name.length + 1) === name + "=") {
+                        cookieValue = decodeURIComponent(
+                            cookie.substring(name.length + 1)
+                        );
+                        break;
+                    }
+                }
+            }
+
+            return cookieValue;
+        }
+
+        function atualizarPlaceholders() {
+            document.querySelectorAll(".lanche").forEach(td => {
+                if (td.innerText.trim() === "" || td.innerText.trim() === "-") {
+                    td.innerText = "";
+                    td.classList.add("vazio");
+                } else {
+                    td.classList.remove("vazio");
+                }
+
+                td.addEventListener("focus", function () {
+                    this.classList.remove("vazio");
+                });
+
+                td.addEventListener("blur", function () {
+                    if (this.innerText.trim() === "") {
+                        this.classList.add("vazio");
+                    }
+                });
+            });
+        }
+
+        window.addEventListener("load", atualizarPlaceholders);
+    </script>
+
+</body>
+
+</html>

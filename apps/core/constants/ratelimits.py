@@ -1,0 +1,4 @@
+LOGIN = "10/m"
+PASSWORD_RESET = "3/h"
+UPLOAD = "4/min"
+EXCLUIR = "10/min"

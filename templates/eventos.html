@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<link rel="stylesheet" href="estilo.css">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{% static 'css/estilo.css' %}">
+
+<title>Eventos</title>
+
+<style>
+
+    header{background:#DA804B;}
+
+    main{
+        grid-template-columns:1fr 1fr;
+    }
+    article{
+        border:5px solid #DA804B;
+        background:white;
+        gap:35px;
+        display:flex;
+        height: 270px;
+        align-items: center;
+    }
+    article img{
+        margin-left: 20px;
+        width: 500px;
+        height:200px;
+        background:#d3d3d3;
+    }
+
+    h3{
+        font-size:35px;
+        font-weight: bold;
+        color:#222;
+    }
+    article p{
+        font-size:28px;
+        color:#444;
+        line-height:1.4;
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <img class="logo" src="{% static 'img/logoif.png.png' %}" alt="Logo IFRS">
+    <h1>EVENTOS</h1>
+</header>
+
+<main id="eventos">
+
+{% for evento in eventos %}
+
+<article>
+
+    {% if evento.imagem %}
+        <img src="{{ evento.imagem.url }}" alt="{{ evento.titulo }}">
+    {% else %}
+        <img src="{% static 'img/GD_imgSemImagem.png' %}" alt="Sem imagem">
+    {% endif %}
+
+    <div>
+        <h3>{{ evento.titulo }}</h3>
+
+        {% if evento.descricao %}
+        <p>{{ evento.descricao }}</p>
+        {% endif %}
+    </div>
+
+</article>
+
+{% empty %}
+
+<article>
+
+    <div>
+        <h3>Nenhum evento cadastrado</h3>
+    </div>
+
+</article>
+
+{% endfor %}
+
+</main>
+
+
+<script src="estilo.js"></script>
+<script>
+
+</script>
+
+</body>
+</html>

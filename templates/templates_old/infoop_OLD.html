@@ -1,0 +1,521 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Informações Operacionais</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#e5e5e5;
+}
+
+/* TOPO */
+
+.topo{
+    background:#4d367e;
+    height:90px;
+    display:flex;
+    align-items:center;
+    padding:0 20px;
+}
+
+.logo{
+    width:230px;
+}
+
+.topo h1{
+    flex:1;
+    text-align:center;
+    color:white;
+    font-size:48px;
+    font-weight:bold;
+    margin-right:230px;
+}
+
+/* ÁREA GERAL */
+
+main{
+    width:95%;
+    height:calc(100vh - 90px);
+    margin:0 auto;
+    padding-top:35px;
+    position:relative;
+}
+
+/* CONTAINER */
+
+.container{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:30px;
+}
+
+/* ESQUERDA */
+
+.esquerda{
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+}
+
+/* CARD */
+
+.card{
+    background:white;
+    border:2px solid #5b428e;
+    padding:15px;
+}
+
+.linha{
+    display:flex;
+    justify-content:space-between;
+}
+
+.coluna{
+    width:33%;
+}
+
+.titulo{
+    font-size:18px;
+    font-weight:bold;
+    color:#222;
+    margin-bottom:10px;
+}
+
+.texto{
+    font-size:18px;
+    font-weight:bold;
+    color:#222;
+}
+
+.hora-card{
+    font-size:18px;
+    color:#444;
+    margin-top:5px;
+}
+
+.link{
+    color:#222;
+    font-size:18px;
+    font-weight:bold;
+    text-decoration:underline;
+}
+
+/* DIREITA */
+
+.direita{
+    margin-top:50px;
+}
+
+.mes{
+    width:80%;
+    margin:auto;
+    background:#5b428e;
+    color:white;
+    text-align:center;
+    font-size:32px;
+    font-weight:bold;
+    padding:6px;
+    margin-bottom:20px;
+    text-transform:uppercase;
+}
+
+/* TABELA */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border:2px solid #5b428e;
+}
+
+th{
+    padding:8px;
+    text-align:left;
+    border:1px solid #777;
+    font-size:18px;
+}
+
+td{
+    border:1px solid #777;
+    padding:8px;
+    font-weight:bold;
+    font-size:16px;
+}
+
+/* AJUSTE CONFORME QUANTIDADE */
+
+.esquerda.total-many{
+    gap:12px;
+}
+
+.esquerda.total-many .card{
+    padding:10px;
+}
+
+.esquerda.total-many .titulo,
+.esquerda.total-many .texto,
+.esquerda.total-many .hora-card,
+.esquerda.total-many .link{
+    font-size:14px;
+}
+
+.esquerda.total-many .titulo{
+    margin-bottom:5px;
+}
+
+.esquerda.total-many .linha{
+    gap:12px;
+}
+
+/* FOOTER */
+
+footer{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:45px;
+
+    display:flex;
+    gap:30px;
+    align-items:center;
+}
+
+.weather-card{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    font-size:1.4rem;
+    color:#fff;
+}
+
+.weather-card i{
+    font-size:2rem;
+}
+
+.info{
+    background:white;
+    border:2px solid #5b428e;
+    color:#5b428e;
+
+    width:180px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    padding:12px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.info i{
+    font-size:24px;
+}
+/* AVISOS */
+
+.marquee{
+    flex:1;
+    height:55px;
+    background:#4d367e;
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+    position:relative;
+    border-radius:2px;
+}
+
+.marquee p{
+    position:absolute;
+    white-space:nowrap;
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+    animation:rolar 25s linear infinite;
+}
+
+@keyframes rolar{
+    from{
+        transform:translateX(100%);
+    }
+
+    to{
+        transform:translateX(-100%);
+    }
+}
+
+/* RESPONSIVO */
+
+@media(max-width:900px){
+    html,
+    body{
+        overflow:auto;
+    }
+
+    .topo{
+        flex-direction:column;
+        height:auto;
+        padding:15px;
+    }
+
+    .topo h1{
+        font-size:30px;
+        margin-top:10px;
+        margin-right:0;
+    }
+
+    main{
+        height:auto;
+        padding-bottom:130px;
+    }
+
+    .container{
+        grid-template-columns:1fr;
+    }
+
+    .linha{
+        flex-direction:column;
+        gap:15px;
+    }
+
+    .coluna{
+        width:100%;
+    }
+
+    footer{
+        position:fixed;
+        left:15px;
+        right:15px;
+        bottom:15px;
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .info,
+    .marquee{
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="topo">
+
+    <img
+    class="logo"
+    src="{% static 'img/logoif.png.png' %}"
+    alt="Logo IFRS">
+
+    <h1>INFORMAÇÕES OPERACIONAIS</h1>
+
+</div>
+
+<main>
+
+    <div class="container">
+
+        <div
+        class="esquerda
+        {% if infos|length > 3 %}
+            total-many
+        {% endif %}
+        ">
+
+            {% for item in infos %}
+
+            <div class="card">
+
+                <div class="linha">
+
+                    <div class="coluna">
+
+                        <div class="titulo">
+                            DATA / HORA
+                        </div>
+
+                        <div class="texto">
+                            {{ item.data_lancamento|date:"d/m/Y" }}
+                        </div>
+
+                        <div class="hora-card">
+                            {{ item.hora_lancamento|time:"H:i" }}
+                        </div>
+
+                    </div>
+
+                    <div class="coluna">
+
+                        <div class="titulo">
+                            {{ item.tipo }}
+                        </div>
+
+                        <a href="#" class="link">
+                            {{ item.titulo }}
+                        </a>
+
+                    </div>
+
+                    <div class="coluna">
+
+                        <div class="titulo">
+                            CATEGORIA
+                        </div>
+
+                        <div class="texto">
+                            {{ item.categoria }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <div class="card">
+
+                <div class="linha">
+
+                    <div class="coluna">
+
+                        <div class="texto">
+                            Nenhuma informação cadastrada.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="direita">
+
+            <div class="mes">
+                {{ mes_atual }}
+            </div>
+
+            <table>
+
+                <tr>
+                    <th>OBSERVAÇÕES</th>
+                </tr>
+
+                <tbody>
+
+                    {% for data in datas_importantes %}
+
+                    <tr>
+                        <td>
+                            <strong>
+                                {{ data.data|date:"d/m/Y" }}
+                            </strong>
+
+                            -
+
+                            {{ data.titulo }}
+
+                            {% if data.descricao %}
+                            <br>
+                            {{ data.descricao }}
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td>
+                            Nenhuma data importante cadastrada.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <footer>
+
+<div class="info">
+
+    <i class="{{ clima.icone }}"></i>
+
+    <span>{{ clima.temperatura }}°C</span>
+
+    <span>|</span>
+
+    <span id="hora"></span>
+
+</div>
+      <div class="marquee">
+
+            <p>
+                {% for aviso in avisos %}
+
+                    {{ aviso.titulo_aviso }}
+
+                    {% if not forloop.last %}
+                        • • •
+                    {% endif %}
+
+                {% empty %}
+
+                    *AVISOS INSTITUCIONAIS
+
+                {% endfor %}
+            </p>
+
+        </div>
+
+    </footer>
+
+</main>
+
+<script>
+function atualizarHora(){
+    const agora = new Date();
+
+    document.getElementById("hora").innerHTML =
+    agora.toLocaleTimeString(
+        "pt-BR",
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+}
+
+setInterval(atualizarHora,1000);
+atualizarHora();
+</script>
+
+</body>
+</html>

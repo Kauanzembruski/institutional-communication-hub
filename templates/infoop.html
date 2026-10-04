@@ -1,0 +1,642 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
+
+    <title>Informações Operacionais</title>
+
+
+    <style>
+
+        /* =====================================================
+           CABEÇALHO
+        ===================================================== */
+
+        header {
+            background: #493377;
+        }
+
+
+        /* =====================================================
+           LAYOUT PRINCIPAL
+        ===================================================== */
+
+        main {
+            display: grid;
+
+            grid-template-columns: 10fr 7fr;
+
+            gap: 100px;
+
+            width: 88%;
+
+            margin: 60px auto 100px auto;
+
+            align-items: start;
+        }
+
+
+        /* =====================================================
+           COLUNA ESQUERDA
+        ===================================================== */
+
+        .esquerda {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 50px;
+
+            width: 100%;
+        }
+
+
+        /* =====================================================
+           CARDS
+        ===================================================== */
+
+        .card {
+
+            width: 100%;
+
+            height: 150px;
+
+            background: #192d6a1f;
+
+            border: 5px solid #493377;
+
+            display: flex;
+
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           DATA
+        ===================================================== */
+
+        .data {
+
+            width: 25%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            text-align: left;
+
+            padding: 15px;
+
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           TÍTULO
+        ===================================================== */
+
+        .titulo {
+
+            width: 50%;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            text-align: center;
+
+            padding: 10px;
+
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           CATEGORIA
+        ===================================================== */
+
+        .catego {
+
+            width: 25%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            text-align: right;
+
+            padding: 15px;
+
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           TEXTOS DOS CARDS
+        ===================================================== */
+
+        h3 {
+
+            margin: 0;
+
+            font-size: 30px;
+
+            font-weight: bold;
+
+            color: #222;
+        }
+
+
+        p {
+
+            margin: 5px 0;
+
+            font-size: 25px;
+
+            font-weight: bold;
+
+            color: #222;
+        }
+
+
+        a {
+
+            font-size: 25px;
+
+            font-weight: bold;
+
+            color: #222;
+        }
+
+
+        /* =====================================================
+           COLUNA DIREITA
+        ===================================================== */
+
+        .direita {
+
+            width: 100%;
+
+            margin-top: 15px;
+        }
+
+
+        /* =====================================================
+           TÍTULO DO MÊS
+        ===================================================== */
+
+        .direita h2 {
+
+            width: 80%;
+
+            margin: 0 auto 20px auto;
+
+            background: #493377;
+
+            color: white;
+
+            text-align: center;
+
+            font-size: 35px;
+
+            font-weight: bold;
+
+            padding: 10px;
+
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           TABELA DE OBSERVAÇÕES
+        ===================================================== */
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            background: white;
+
+            border: 5px solid #493377;
+        }
+
+
+        /* Cabeçalho da tabela */
+
+        th {
+
+            padding: 15px;
+
+            text-align: left;
+
+            border: 5px solid #493377;
+
+            font-size: 30px;
+        }
+
+
+        /* Linhas da tabela */
+
+        td {
+
+            border: 5px solid #493377;
+
+            min-height: 30px;
+
+            padding: 10px;
+
+            font-weight: bold;
+
+            font-size: 27px;
+
+            line-height: 1.25;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        footer {
+
+            position: fixed;
+
+            bottom: 20px;
+
+            left: 0;
+
+            width: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 25px;
+
+            padding: 0 40px;
+
+            box-sizing: border-box;
+
+            z-index: 100;
+        }
+
+
+        /* Hora */
+
+        .hora {
+
+            background: #f5f5f5;
+
+            border: 3px solid #aaa;
+
+            border-radius: 10px;
+
+            padding: 12px 15px;
+
+            font-size: 20px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+        }
+
+
+        /* Aviso */
+
+        .aviso {
+
+            flex: 1;
+
+            height: 65px;
+
+            background: #eeeeee;
+
+            border: 3px solid #aaa;
+
+            border-radius: 5px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+
+        .aviso p {
+
+            margin: 0;
+
+            font-size: 23px;
+
+            font-weight: bold;
+
+            color: #222;
+        }
+
+
+        /* =====================================================
+           RESPONSIVIDADE
+        ===================================================== */
+
+        @media (max-width: 1000px) {
+
+            main {
+
+                grid-template-columns: 1fr;
+
+                gap: 40px;
+
+            }
+
+            .direita {
+
+                margin-top: 0;
+
+            }
+
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         CABEÇALHO
+    ===================================================== -->
+
+    <header>
+
+        <img
+            class="logo"
+            src="{% static 'img/logoif.png.png' %}"
+            alt="Logo IFRS"
+        >
+
+        <h1>
+            INFORMAÇÕES OPERACIONAIS
+        </h1>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         CONTEÚDO PRINCIPAL
+    ===================================================== -->
+
+    <main>
+
+
+        <!-- =================================================
+             COLUNA ESQUERDA
+        ================================================= -->
+
+        <section class="esquerda">
+
+
+            {% for item in infos %}
+
+
+                <!-- CARD -->
+
+                <article class="card">
+
+
+                    <!-- DATA -->
+
+                    <div class="data">
+
+                        <h3>
+                            DATA
+                        </h3>
+
+                        <p>
+                            {{ item.data_lancamento|date:"d/m/Y" }}
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- TÍTULO -->
+
+                    <div class="titulo">
+
+                        <h3>
+
+                            <a href="#">
+
+                                {{ item.titulo }}
+
+                            </a>
+
+                        </h3>
+
+                    </div>
+
+
+
+                    <!-- CATEGORIA -->
+
+                    <div class="catego">
+
+                        <h3>
+                            CATEGORIA
+                        </h3>
+
+                        <p>
+                            {{ item.categoria }}
+                        </p>
+
+                    </div>
+
+
+                </article>
+
+
+            {% empty %}
+
+
+                <!-- CASO NÃO TENHA INFORMAÇÕES -->
+
+                <article class="card">
+
+                    <div class="titulo">
+
+                        <h3>
+                            Nenhuma informação cadastrada.
+                        </h3>
+
+                    </div>
+
+                </article>
+
+
+            {% endfor %}
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             COLUNA DIREITA
+        ================================================= -->
+
+        <aside class="direita">
+
+
+            <!-- MÊS -->
+
+            <h2>
+
+                {{ mes_atual }}
+
+            </h2>
+
+
+
+            <!-- OBSERVAÇÕES -->
+
+            <table>
+
+
+                <tr>
+
+                    <th>
+                        OBSERVAÇÕES
+                    </th>
+
+                </tr>
+
+
+
+                <tbody>
+
+
+                    {% for data in datas_importantes %}
+
+
+                        <tr>
+
+                            <td>
+
+
+                                <strong>
+
+                                    {{ data.data|date:"d/m/Y" }}
+
+                                </strong>
+
+
+                                -
+
+
+                                {{ data.titulo }}
+
+
+
+                                {% if data.descricao %}
+
+                                    <br>
+
+                                    {{ data.descricao }}
+
+                                {% endif %}
+
+
+                            </td>
+
+                        </tr>
+
+
+                    {% empty %}
+
+
+                        <tr>
+
+                            <td>
+
+                                Nenhuma data importante cadastrada.
+
+                            </td>
+
+                        </tr>
+
+
+                    {% endfor %}
+
+
+                </tbody>
+
+
+            </table>
+
+
+        </aside>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         RODAPÉ
+    ===================================================== -->
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
+    <script>
+
+        function atualizarHora() {
+
+            const agora = new Date();
+
+            document.getElementById("hora").innerHTML =
+
+                agora.toLocaleTimeString(
+                    "pt-BR",
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
+
+        }
+
+
+        setInterval(atualizarHora, 1000);
+
+        atualizarHora();
+
+    </script>
+
+
+</body>
+
+</html>

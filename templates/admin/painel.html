@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+    <style>
+        body.inicial {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #ffffff;
+        }
+
+        nav {
+            background: #929292;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .publico {
+            background: #1d3557;
+            padding: 10px 18px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .publico:hover {
+            background: #274c77;
+        }
+
+        .pesquisa {
+            width: 300px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .login {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .titulo {
+            text-align: center;
+            margin-top: 30px;
+            color: #000000;
+        }
+
+        .cards {
+            width: 90%;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        article.inicial {
+            background: rgb(187, 187, 189);
+            border-radius: 20px;
+            border: 2px solid #d4d4d4;
+            padding: 20px;
+            text-align: center;
+            transition: 0.3s;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+
+        article.inicial:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        article.inicial h3 {
+            color: #000000;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        img.inicial {
+            width: 170px;
+            height: 170px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-top: 15px;
+        }
+
+        @media(max-width:1000px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width:700px) {
+            nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .pesquisa {
+                width: 90%;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="inicial">
+
+    <header>
+        <nav>
+            <div class="nav-links">
+                <a href="{% url 'logout' %}">Sair</a>
+
+                <a class="publico" href="{% url 'painel_publico' %}">
+                    Tela Pública
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <h1 class="titulo">Painel Administrativo</h1>
+
+    <section class="cards">
+
+        <a class="card-link" href="{% url 'datasimport' %}">
+            <article class="inicial">
+                <h3>Datas Importantes</h3>
+                <img class="inicial" src="{% static 'img/datasimportantes.png.png' %}" alt="Datas Importantes">
+            </article>
+        </a>
+
+        <a class="card-link" href="{% url 'avisosinst' %}">
+            <article class="inicial">
+                <h3>Avisos Institucionais</h3>
+                <img class="inicial" src="{% static 'img/avisos.png.png' %}" alt="Avisos Institucionais">
+            </article>
+        </a>
+
+        <a class="card-link" href="{% url 'achados' %}">
+            <article class="inicial">
+                <h3>Achados e Perdidos</h3>
+                <img class="inicial" src="{% static 'img/achaperde.png.png' %}" alt="Achados e Perdidos">
+            </article>
+        </a>
+
+        <a class="card-link" href="{% url 'cardapio' %}">
+            <article class="inicial">
+                <h3>Cardápio</h3>
+                <img class="inicial" src="{% static 'img/cardapio.png' %}" alt="Cardápio">
+            </article>
+        </a>
+
+        <a class="card-link" href="{% url 'infoopadm' %}">
+            <article class="inicial">
+                <h3>Informações Operacionais</h3>
+                <img class="inicial" src="{% static 'img/infooperacionais.png.png' %}" alt="Informações Operacionais">
+            </article>
+        </a>
+
+        <a class="card-link" href="{% url 'eventosadm' %}">
+            <article class="inicial">
+                <h3>Eventos</h3>
+                <img class="inicial" src="{% static 'img/eventos.png.png' %}" alt="Eventos">
+            </article>
+        </a>
+
+        <a class="card-link" href="{% url 'pxaulasadm' %}">
+            <article class="inicial">
+                <h3>Próximas Aulas</h3>
+                <img class="inicial" src="{% static 'img/pxaulas.png.png' %}" alt="Próximas Aulas">
+            </article>
+        </a>
+
+        <a class="card-link" href="{% url 'calendario' %}">
+            <article class="inicial">
+                <h3>Adicionar Prova</h3>
+                <img class="inicial" src="{% static 'img/provas.png.png' %}" alt="Adicionar Prova">
+            </article>
+        </a>
+
+        <a class="card-link" href="{% url 'lembretes' %}">
+            <article class="inicial">
+                <h3>Lembretes</h3>
+                <img class="inicial" src="{% static 'img/lembretes.png.png' %}" alt="Lembretes">
+            </article>
+        </a>
+
+    </section>
+
+</body>
+
+</html>

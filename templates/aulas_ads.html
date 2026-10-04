@@ -1,0 +1,302 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Próximas Aulas - Análise e Desenvolvimento de Sistemas</title>
+
+    <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #ececec;
+            color: #222;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: #0F2464;
+            height: 115px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .logo {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 55px;
+            width: auto;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 72px;
+            font-weight: 800;
+            text-align: center;
+            line-height: 1;
+        }
+
+        main {
+            width: 1150px;
+            max-width: 78%;
+            margin: 55px auto 0 auto;
+            padding-bottom: 150px;
+        }
+
+        h2 {
+            font-size: 38px;
+            color: #222;
+            text-align: center;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 35px;
+            text-transform: uppercase;
+        }
+
+        #proximoHorario {
+            display: inline-block;
+            margin-top: 4px;
+            font-size: 46px;
+            font-weight: 800;
+        }
+
+        #tabelaAulas {
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+        }
+
+        .turma {
+            background: #fff;
+            border: 5px solid #041546;
+            display: flex;
+            align-items: stretch;
+            min-height: 115px;
+            width: 100%;
+        }
+
+        .turma h3 {
+            margin: 0;
+            width: 270px;
+            min-width: 270px;
+            background: #041546;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            font-weight: 800;
+            clip-path: polygon(0 0, 100% 0%, 78% 100%, 0 100%);
+        }
+
+        .turma .aula {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 29px;
+            font-weight: 700;
+            color: #222;
+            padding: 0 30px;
+        }
+
+        .turma .sala {
+            width: 190px;
+            min-width: 190px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            text-align: right;
+            font-size: 28px;
+            font-weight: 700;
+            color: #222;
+            padding-right: 20px;
+        }
+
+        .vazio {
+            width: 100%;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 35px;
+            background: #fff;
+            border: 4px solid #041546;
+        }
+
+        footer {
+            position: fixed;
+            left: 45px;
+            right: 45px;
+            bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .hora {
+            min-width: 150px;
+            padding: 14px 18px;
+            border: 4px solid #b7b7b7;
+            border-radius: 10px;
+            background: transparent;
+            font-size: 24px;
+            font-weight: 700;
+            color: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .aviso {
+            flex: 1;
+            min-height: 76px;
+            border: 4px solid #b7b7b7;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding: 0 38px;
+            background: transparent;
+        }
+
+        .aviso p {
+            font-size: 26px;
+            font-weight: 800;
+            color: #222;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 1200px) {
+            h1 {
+                font-size: 54px;
+            }
+
+            main {
+                max-width: 88%;
+            }
+
+            .turma h3 {
+                width: 220px;
+                min-width: 220px;
+                font-size: 28px;
+            }
+
+            .turma .aula {
+                font-size: 24px;
+            }
+
+            .turma .sala {
+                width: 150px;
+                min-width: 150px;
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img class="logo" src="{% static 'img/logoif.png.png' %}" alt="Logo IFRS">
+        <h1>PRÓXIMAS AULAS</h1>
+    </header>
+
+    <main>
+        <h2>
+            ANÁLISE E DESENVOLVIMENTO DE SISTEMAS
+            <br>
+            <span id="proximoHorario"></span>
+        </h2>
+
+        <section id="tabelaAulas"></section>
+    </main>
+
+
+    <script>
+        async function carregarAulas() {
+            try {
+                const resposta = await fetch("/pxaulas/api/proximas-aulas/ADS/");
+
+                if (!resposta.ok) {
+                    throw new Error(`Erro HTTP: ${resposta.status}`);
+                }
+
+                const retorno = await resposta.json();
+                console.log("Resposta API:", retorno);
+
+                document.getElementById("proximoHorario").textContent = retorno.horario ?? "";
+
+                const tabela = document.getElementById("tabelaAulas");
+                tabela.innerHTML = "";
+
+                if (!retorno.dados || retorno.dados.length === 0) {
+                    tabela.innerHTML = `
+                        <div class="vazio">
+                            Nenhuma próxima aula encontrada.
+                        </div>
+                    `;
+                    return;
+                }
+
+                retorno.dados.sort((a, b) =>
+                    String(a.turma).localeCompare(
+                        String(b.turma),
+                        "pt-BR",
+                        { numeric: true, sensitivity: "base" }
+                    )
+                );
+
+                retorno.dados.forEach(item => {
+                    const numero = String(item.turma || "")
+                        .replace(/[AB]/gi, "")
+                        .replace(/\D/g, "")
+                        .trim();
+
+                    tabela.innerHTML += `
+                        <article class="turma">
+                            <h3>${numero}° Sem</h3>
+                            <p class="aula">${item.materia ?? "-"}</p>
+                            <p class="sala">${item.sala ?? "-"}</p>
+                        </article>
+                    `;
+                });
+
+            } catch (erro) {
+                console.error("Erro ao carregar aulas:", erro);
+
+                document.getElementById("tabelaAulas").innerHTML = `
+                    <div class="vazio">
+                        Erro ao carregar as próximas aulas.
+                    </div>
+                `;
+            }
+        }
+
+        function atualizarHora() {
+            const agora = new Date();
+            const horas = String(agora.getHours()).padStart(2, "0");
+            const minutos = String(agora.getMinutes()).padStart(2, "0");
+            document.getElementById("hora").textContent = `${horas}:${minutos}`;
+        }
+
+        carregarAulas();
+        atualizarHora();
+
+        setInterval(carregarAulas, 60000);
+        setInterval(atualizarHora, 1000);
+    </script>
+
+</body>
+</html>

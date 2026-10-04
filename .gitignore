@@ -1,0 +1,44 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.env.save
+tools/redis/
+*.log
+
+# Credenciais e configuracoes locais
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.vscode/
+.idea/
+
+# Dumps, backups e bancos locais
+*.sql
+*.sql.*
+*.sqlite3
+*.db
+*.dump
+*.backup
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+
+# Uploads e arquivos gerados
+media/
+staticfiles/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+Thumbs.db
+.DS_Store

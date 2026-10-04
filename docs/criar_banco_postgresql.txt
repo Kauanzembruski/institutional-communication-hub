@@ -1,0 +1,294 @@
+-- ============================================================================
+-- Banco PostgreSQL para o projeto Mural Institucional IFRS
+-- ============================================================================
+-- Como usar:
+-- 1. Abra o terminal com o PostgreSQL instalado.
+-- 2. Entre no PostgreSQL como usuario administrador:
+--      psql -U postgres
+-- 3. Execute este arquivo:
+--      \i C:/projetos/IFRS/docs/criar_banco_postgresql.txt
+--
+-- Observacao:
+-- - Este script cria as tabelas do app dashboard, que no Django estao com
+--   managed = False. As tabelas internas do Django/admin continuam sendo
+--   criadas com:
+--      .\venv\Scripts\python.exe manage.py migrate
+-- - Os campos de status NAO usam varchar livre. Eles usam o tipo PostgreSQL
+--   status_registro, aceitando somente: 'ativo' ou 'inativo'.
+-- ============================================================================
+
+-- Encerra conexoes abertas antes de recriar o banco.
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE datname = 'MuralIFRS'
+  AND pid <> pg_backend_pid();
+
+DROP DATABASE IF EXISTS "MuralIFRS";
+CREATE DATABASE "MuralIFRS"
+  WITH
+  OWNER = postgres
+  ENCODING = 'UTF8';
+
+\connect "MuralIFRS"
+
+-- ============================================================================
+-- Tipos controlados
+-- ============================================================================
+
+DROP TYPE IF EXISTS status_registro CASCADE;
+
+CREATE TYPE status_registro AS ENUM (
+  'ativo',
+  'inativo'
+);
+
+-- ============================================================================
+-- Limpeza das tabelas do projeto, se ja existirem
+-- ============================================================================
+
+DROP TABLE IF EXISTS horario CASCADE;
+DROP TABLE IF EXISTS eventos CASCADE;
+DROP TABLE IF EXISTS avisos CASCADE;
+DROP TABLE IF EXISTS disciplina CASCADE;
+DROP TABLE IF EXISTS professor CASCADE;
+DROP TABLE IF EXISTS usuario CASCADE;
+DROP TABLE IF EXISTS permissoes CASCADE;
+DROP TABLE IF EXISTS turma CASCADE;
+
+-- ============================================================================
+-- Tabelas principais
+-- ============================================================================
+
+CREATE TABLE turma (
+  id_turma SERIAL PRIMARY KEY,
+  curso_turma VARCHAR(100) NOT NULL,
+  ano_escolar INTEGER NOT NULL,
+  turno_turma VARCHAR(50) NOT NULL,
+
+  CONSTRAINT turma_ano_escolar_valido
+    CHECK (
+      ano_escolar BETWEEN 1 AND 3
+    )
+);
+
+CREATE TABLE permissoes (
+  id_nivel_permissao SERIAL PRIMARY KEY,
+  tipo_permissao VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE usuario (
+  id_usuario SERIAL PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  senha VARCHAR(255) NOT NULL,
+  id_turma INTEGER,
+  data_criacao DATE DEFAULT CURRENT_DATE,
+  ultimo_login TIMESTAMPTZ,
+  id_nivel_permissao INTEGER,
+  status_usu status_registro NOT NULL DEFAULT 'ativo',
+
+  CONSTRAINT usuario_turma_fk
+    FOREIGN KEY (id_turma)
+    REFERENCES turma (id_turma)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL,
+
+  CONSTRAINT usuario_permissao_fk
+    FOREIGN KEY (id_nivel_permissao)
+    REFERENCES permissoes (id_nivel_permissao)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT,
+
+  CONSTRAINT usuario_email_basico_valido
+  CHECK (
+    email LIKE '%_@_%._%'
+  )
+);
+
+CREATE TABLE disciplina (
+  id_disciplina SERIAL PRIMARY KEY,
+  nome_disciplina VARCHAR(100) NOT NULL,
+  status_disciplina status_registro NOT NULL DEFAULT 'ativo'
+);
+
+CREATE TABLE avisos (
+  id_aviso SERIAL PRIMARY KEY,
+  titulo_aviso VARCHAR(100) NOT NULL,
+  mensagem TEXT NOT NULL,
+
+  data_publi DATE NOT NULL DEFAULT CURRENT_DATE,
+  data_expi DATE,
+
+  status_aviso status_registro NOT NULL DEFAULT 'ativo',
+
+  CONSTRAINT avisos_titulo_nao_vazio
+    CHECK (length(trim(titulo_aviso)) >= 3),
+
+  CONSTRAINT avisos_mensagem_nao_vazia
+    CHECK (length(trim(mensagem)) > 0),
+
+  CONSTRAINT avisos_periodo_valido
+    CHECK (
+      data_expi IS NULL
+      OR data_expi >= data_publi
+    )
+);
+
+CREATE TABLE eventos (
+  id_evento SERIAL PRIMARY KEY,
+  titulo_evento VARCHAR(100) NOT NULL,
+  descricao TEXT NOT NULL,
+  evento_horario TIMESTAMPTZ NOT NULL,
+  status_evento status_registro NOT NULL DEFAULT 'ativo'
+
+);
+
+CREATE TABLE professor (
+  id_professor SERIAL PRIMARY KEY,
+  nome_professor VARCHAR(100) NOT NULL,
+  email VARCHAR(150) UNIQUE,
+  status_professor status_registro NOT NULL DEFAULT 'ativo',
+
+  CONSTRAINT professor_email_basico_valido
+  CHECK (
+    email LIKE '%_@_%._%'
+  )
+);
+
+CREATE TABLE horario (
+  id_horario SERIAL PRIMARY KEY,
+
+  id_turma INTEGER NOT NULL,
+  id_disciplina INTEGER NOT NULL,
+
+  dia_semana VARCHAR(20) NOT NULL,
+  numero_periodo INTEGER NOT NULL,
+
+  horario_inicio TIME NOT NULL,
+  horario_fim TIME NOT NULL,
+
+  id_professor INTEGER NOT NULL,
+  status_horario status_registro NOT NULL DEFAULT 'ativo',
+
+  CONSTRAINT horario_professor_fk
+  FOREIGN KEY (id_professor)
+  REFERENCES professor(id_professor)
+  ON UPDATE CASCADE
+  ON DELETE RESTRICT,
+
+
+  CONSTRAINT horario_turma_fk
+    FOREIGN KEY (id_turma)
+    REFERENCES turma(id_turma)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+
+  CONSTRAINT horario_disciplina_fk
+    FOREIGN KEY (id_disciplina)
+    REFERENCES disciplina(id_disciplina)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT,
+
+  CONSTRAINT horario_dia_semana_valido
+    CHECK (dia_semana IN (
+      'segunda',
+      'terca',
+      'quarta',
+      'quinta',
+      'sexta'
+    )),
+
+  CONSTRAINT horario_periodo_numero_valido
+    CHECK (numero_periodo BETWEEN 1 AND 6),
+
+  CONSTRAINT horario_periodo_valido
+    CHECK (horario_fim > horario_inicio),
+
+  CONSTRAINT horario_unico_por_turma_dia_periodo
+    UNIQUE (id_turma, dia_semana, numero_periodo)
+);
+
+-- ============================================================================
+-- Indices para consultas usadas pelo painel/admin
+-- ============================================================================
+
+CREATE INDEX idx_usuario_turma
+  ON usuario (id_turma);
+
+CREATE INDEX idx_usuario_permissao
+  ON usuario (id_nivel_permissao);
+
+CREATE INDEX idx_disciplina_status
+  ON disciplina (status_disciplina);
+
+CREATE INDEX idx_avisos_status_datas
+  ON avisos (status_aviso, data_publi, data_expi);
+
+CREATE INDEX idx_eventos_status_horario
+  ON eventos (status_evento, evento_horario);
+
+CREATE INDEX idx_professor_status
+  ON professor (status_professor);
+
+CREATE INDEX idx_horario_status_dia
+  ON horario (status_horario, dia_semana);
+
+CREATE INDEX idx_horario_turma_disciplina
+  ON horario (id_turma, id_disciplina);
+
+CREATE INDEX idx_horario_professor
+  ON horario (id_professor);
+
+-- ============================================================================
+-- Dados iniciais opcionais, compativeis com o comando seed_demo do projeto
+-- ============================================================================
+
+INSERT INTO permissoes (tipo_permissao)
+VALUES
+  ('Administrador'),
+  ('Editor'),
+  ('Rep_Turma')
+ON CONFLICT (tipo_permissao) DO NOTHING;
+
+INSERT INTO turma (
+  curso_turma,
+  ano_escolar,
+  turno_turma
+)
+VALUES (
+  'Informatica',
+  1,
+  'Manha'
+)
+ON CONFLICT DO NOTHING;
+
+-- ============================================================================
+-- Verificacao rapida
+-- ============================================================================
+
+\dt
+
+SELECT
+  table_name,
+  column_name,
+  udt_name,
+  is_nullable,
+  column_default
+FROM information_schema.columns
+WHERE table_schema = 'public'
+  AND table_name IN (
+    'turma',
+    'permissoes',
+    'usuario',
+    'disciplina',
+    'avisos',
+    'eventos',
+    'professor',
+    'horario'
+  )
+ORDER BY table_name, ordinal_position;
+
+-- Apos executar este arquivo, rode no terminal do projeto:
+--   .\venv\Scripts\python.exe manage.py migrate
+--   .\venv\Scripts\python.exe manage.py check
+--   .\venv\Scripts\python.exe manage.py seed_demo

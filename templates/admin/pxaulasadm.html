@@ -1,0 +1,777 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Horários</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+    
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background: #ffffff;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* HEADER */
+    nav {
+        background: #929292;
+        height: 78px;
+        padding: 0 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .login {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+    }
+
+    /* TOPO / FILTROS */
+    .topo {
+        background: white;
+        padding: 20px;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .topo h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 26px;
+    }
+
+    select,
+    button,
+    input {
+        padding: 8px;
+        margin: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-family: Arial, sans-serif;
+    }
+
+    button {
+        cursor: pointer;
+        background: #bbbbbb;
+        color: white;
+        border: none;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background: #565656;
+    }
+
+    .carregar {
+        background: #2f3e9e;
+    }
+
+    .carregar:hover {
+        background: #26358c;
+    }
+
+    /* TABELA */
+    .tabela {
+        width: 80%;
+        margin: 48px auto 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #eee;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    th,
+    td {
+        border: 1px solid #ccc;
+        padding: 12px;
+        text-align: center;
+    }
+
+    th {
+        background: #6b6b6b;
+        color: white;
+    }
+
+    td:hover {
+        background: #ddd;
+        cursor: pointer;
+    }
+
+    /* LINHA DE INTERVALO FIXA */
+    tr.linha-intervalo td {
+        background: #e3e3e3;
+        color: #555;
+        font-weight: bold;
+        cursor: default;
+    }
+
+    tr.linha-intervalo td:hover {
+        background: #e3e3e3;
+        cursor: default;
+    }
+
+    /* BOTÃO + */
+    .btn-add {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        width: 65px;
+        height: 65px;
+        padding: 0;
+        margin: 0;
+        border-radius: 50%;
+        font-size: 35px;
+        line-height: 65px;
+        background: #a8aab5;
+        color: white;
+        border: none;
+        cursor: pointer;
+        z-index: 1000;
+    }
+
+    .btn-add:hover {
+        background: #9699a3;
+    }
+
+    /* MODAIS */
+    .modal {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    }
+
+    .box {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        width: 340px;
+        max-height: 85vh;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .box select,
+    .box input,
+    .box button {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .fechar {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        cursor: pointer;
+        font-size: 20px;
+    }
+
+    .excluir {
+        background: #d62828;
+    }
+
+    @media (max-width: 900px) {
+        .tabela {
+            width: 95%;
+            overflow-x: auto;
+        }
+
+        table {
+            min-width: 800px;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+    <nav>
+        <a href="{% url 'painel' %}">Voltar</a>
+    </nav>
+
+    <div class="topo">
+
+        <h2>Gerenciar Horários</h2>
+
+        <select id="curso" onchange="atualizarFiltrosCurso()">
+            <option>TII</option>
+            <option>ADM</option>
+            <option>ADS</option>
+            <option>TPG</option>
+        </select>
+
+        <select id="ano"></select>
+
+        <select id="turma"  onchange="atualizarFiltrosCurso()">
+            <option>A</option>
+            <option>B</option>
+        </select>
+
+        <select id="turno" onchange="carregarTabela()"></select>
+
+        <select id="sala" onchange="atualizarFiltrosCurso()">
+            <option>Sala 1</option>
+            <option>Sala 2</option>
+            <option>Sala 3</option>
+            <option>Sala 4</option>
+            <option>Sala 5</option>
+            <option>Sala 6</option>
+            <option>Lab 7</option>
+            <option>Lab 8</option>
+            <option>Lab 9</option>
+            <option>Lab 10</option>
+            <option>Sala 11</option>
+            <option>Lab 12</option>
+            <option>Sala 13</option>
+        </select>
+
+        <button class="carregar" onclick="carregarTabela()">Carregar</button>
+
+    </div>
+
+    <div class="tabela">
+    <table>
+
+        <thead>
+            <tr>
+                <th>Horário</th>
+                <th>Seg</th>
+                <th>Ter</th>
+                <th>Qua</th>
+                <th>Qui</th>
+                <th>Sex</th>
+                <th>Sáb</th>
+            </tr>
+        </thead>
+
+        <tbody id="corpo"></tbody>
+
+    </table>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="modal">
+
+        <div class="box">
+
+            <span class="fechar" onclick="fecharModal()">✖</span>
+
+            <h3>Nova Aula</h3>
+
+            <form onsubmit="criar(event)">
+
+                <label>Curso</label><br>
+
+                <select id="novoCurso" onchange="atualizarFiltrosNovoCurso()">
+                    <option>TII</option>
+                    <option>ADM</option>
+                    <option>ADS</option>
+                    <option>TPG</option>
+                </select>
+
+                <br><br>
+
+                <label>Ano/Semestre</label><br>
+
+                <select id="novoAno"></select>
+
+                <br><br>
+
+                <label>Turma</label><br>
+
+                <select id="novaTurma">
+                    <option>A</option>
+                    <option>B</option>
+                </select>
+
+                <br><br>
+
+                <label>Turno</label><br>
+
+                <select id="novoTurno"></select>
+
+                <br><br>
+
+                <label>Sala</label><br>
+
+                <select id="novaSala">
+                    <option>Sala 1</option>
+                    <option>Sala 2</option>
+                    <option>Sala 3</option>
+                    <option>Sala 4</option>
+                    <option>Sala 5</option>
+                    <option>Sala 6</option>
+                    <option>Lab 7</option>
+                    <option>Lab 8</option>
+                    <option>Lab 9</option>
+                    <option>Lab 10</option>
+                    <option>Sala 11</option>
+                    <option>Lab 12</option>
+                    <option>Sala 13</option>
+                </select>
+
+                <br><br>
+
+                <label>Horário</label><br>
+
+                <select id="novoHorario"></select>
+
+                <br><br>
+
+                <label>Dia</label><br>
+
+                <select id="novoDia">
+                    <option value="1">Seg</option>
+                    <option value="2">Ter</option>
+                    <option value="3">Qua</option>
+                    <option value="4">Qui</option>
+                    <option value="5">Sex</option>
+                    <option value="6">Sáb</option>
+                </select>
+
+                <br><br>
+
+                <input type="text" id="novoTexto" placeholder="Nome da aula" required>
+
+                <br><br>
+
+                <button type="submit">Adicionar</button>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- EDIÇÃO -->
+    <div class="modal" id="edicao">
+
+        <div class="box">
+
+            <span class="fechar" onclick="fecharEdicao()">✖</span>
+
+            <h3>Editar Aula</h3>
+
+            <input type="text" id="editTexto">
+
+            <br><br>
+
+            <button onclick="salvar()">Salvar</button>
+            <button class="excluir" onclick="excluir()">Excluir</button>
+
+        </div>
+    </div>
+<script>
+
+        const csrfToken = "{{ csrf_token }}";
+
+        let atual = null;
+
+        const horariosManha = [
+            "08:20",
+            "09:10",
+            "10:00 - Intervalo",
+            "10:20",
+            "11:10"         
+];
+
+        const horariosTarde = [
+            "13:00",
+            "13:50",
+            "14:40",
+            "15:30 - Intervalo",
+            "15:50",
+            "16:40",
+            "17:30"        
+];
+
+        const horariosNoite = [
+            "19:00",
+            "19:50",
+            "20:40 - Intervalo",
+            "20:55",
+            "21:45"        
+];
+
+        function atualizarCampos(curso, idAno, idTurno, idTurma) {
+
+            const selectAno = document.getElementById(idAno);
+            const selectTurno = document.getElementById(idTurno);
+            const selectTurma = document.getElementById(idTurma);
+
+            selectAno.innerHTML = "";
+            selectTurno.innerHTML = "";
+
+            // Remove qualquer regra onchange que tenha ficado do curso anterior.
+            // Isso evita, por exemplo, ADS/TPG voltarem para "Tarde"
+            // quando o semestre é alterado.
+            selectAno.onchange = null;
+
+            // TII e ADM
+            if (curso === "TII" || curso === "ADM") {
+
+                selectTurma.style.display = "inline-block";
+
+                selectAno.innerHTML = `
+                    <option>1 Ano</option>
+                    <option>2 Ano</option>
+                    <option>3 Ano</option>
+                `;
+
+                function aplicarTurnoMedio() {
+
+                    selectTurno.innerHTML = `
+                        <option>Tarde</option>
+                    `;
+
+                    // Apenas o 2º ano pode também ter turno da manhã
+                    if (selectAno.value === "2 Ano") {
+                        selectTurno.innerHTML += `
+                            <option>Manhã</option>
+                        `;
+                    }
+
+                    if (idTurno === "novoTurno") {
+                        atualizarHorariosModal();
+                    } else {
+                        carregarTabela();
+                    }
+                }
+
+                selectAno.onchange = aplicarTurnoMedio;
+                aplicarTurnoMedio();
+            }
+
+            // ADS e TPG
+            if (curso === "ADS" || curso === "TPG") {
+
+                selectTurma.style.display = "none";
+
+                selectAno.innerHTML = `
+                    <option>1 Semestre</option>
+                    <option>2 Semestre</option>
+                    <option>3 Semestre</option>
+                    <option>4 Semestre</option>
+                    <option>5 Semestre</option>
+                    <option>6 Semestre</option>
+                `;
+
+                // ADS/TPG somente à noite
+                selectTurno.innerHTML = `
+                    <option>Noite</option>
+                `;
+
+                selectAno.onchange = function () {
+                    selectTurno.innerHTML = `
+                        <option>Noite</option>
+                    `;
+
+                    if (idTurno === "novoTurno") {
+                        atualizarHorariosModal();
+                    } else {
+                        carregarTabela();
+                    }
+                };
+
+                if (idTurno === "novoTurno") {
+                    atualizarHorariosModal();
+                } else {
+                    carregarTabela();
+                }
+            }
+        }
+
+
+        function atualizarFiltrosCurso() {
+
+            let curso = document.getElementById("curso").value;
+
+            atualizarCampos(
+                curso,
+                "ano",
+                "turno",
+                "turma"
+            );
+        }
+
+
+        function atualizarFiltrosNovoCurso() {
+
+            let curso = document.getElementById("novoCurso").value;
+
+            atualizarCampos(
+                curso,
+                "novoAno",
+                "novoTurno",
+                "novaTurma"
+            );
+
+            atualizarHorariosModal();
+        }
+
+        function atualizarHorariosModal() {
+
+            let turno = document.getElementById("novoTurno").value;
+
+            let select = document.getElementById("novoHorario");
+
+            select.innerHTML = "";
+
+            let horarios = [];
+
+            if (turno === "Manhã") horarios = horariosManha;
+            if (turno === "Tarde") horarios = horariosTarde;
+            if (turno === "Noite") horarios = horariosNoite;
+
+            horarios.forEach(h => {
+
+                if (!h.includes("Intervalo")) {
+                    select.innerHTML += `<option>${h}</option>`;
+                }
+
+            });
+        }
+
+        async function carregarTabela() {
+
+            let url = "{% url 'listar_horarios' %}";
+
+            url += `?curso=${document.getElementById("curso").value}`;
+            url += `&ano=${document.getElementById("ano").value}`;
+            let turmaFiltro = document.getElementById("turma").style.display === "none"
+                ? ""
+                : document.getElementById("turma").value;
+
+            url += `&turma=${turmaFiltro}`;
+            url += `&turno=${document.getElementById("turno").value}`;
+            url += `&sala=${document.getElementById("sala").value}`;
+
+            let resposta = await fetch(url);
+
+            let dados = await resposta.json();
+
+            let corpo = document.getElementById("corpo");
+
+            corpo.innerHTML = "";
+
+            let turno = document.getElementById("turno").value;
+
+            let horarios = [];
+
+            if (turno === "Manhã") horarios = horariosManha;
+            if (turno === "Tarde") horarios = horariosTarde;
+            if (turno === "Noite") horarios = horariosNoite;
+
+            horarios.forEach(h => {
+
+                let tr = document.createElement("tr");
+
+                const ehIntervalo = h.includes("Intervalo");
+
+                if (ehIntervalo) {
+                    tr.classList.add("linha-intervalo");
+                }
+
+                tr.innerHTML = `<td>${h}</td>`;
+
+                for (let i = 1; i <= 6; i++) {
+
+                    let td = document.createElement("td");
+
+                    let key = h + "-" + i;
+
+                    if (ehIntervalo) {
+                        td.innerText = "INTERVALO";
+                        td.onclick = null;
+                    } else {
+                        td.innerText = dados[key] || "";
+                        td.onclick = () => abrirEdicao(td, key);
+                    }
+
+                    tr.appendChild(td);
+                }
+
+                corpo.appendChild(tr);
+            });
+        }
+
+        function abrirEdicao(td, key) {
+
+            atual = {
+
+                td,
+                key,
+                horario: key.substring(0, key.lastIndexOf("-")),
+                dia: key.substring(key.lastIndexOf("-") + 1)
+            };
+
+            document.getElementById("editTexto").value = td.innerText || "";
+
+            document.getElementById("edicao").style.display = "flex";
+        }
+
+        async function salvar() {
+
+            let dados = {
+
+                curso: document.getElementById("curso").value,
+                ano: document.getElementById("ano").value,
+                turma: document.getElementById("turma").style.display === "none"
+                    ? ""
+                    : document.getElementById("turma").value,
+                turno: document.getElementById("turno").value,
+                sala: document.getElementById("sala").value,
+
+                horario: atual.horario,
+                dia: atual.dia,
+
+                texto: document.getElementById("editTexto").value
+            };
+
+            await fetch("{% url 'editar_horario' %}", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+
+                body: JSON.stringify(dados)
+            });
+
+            fecharEdicao();
+
+            carregarTabela();
+        }
+
+        async function excluir() {
+
+            let dados = {
+
+                curso: document.getElementById("curso").value,
+                ano: document.getElementById("ano").value,
+                turma: document.getElementById("turma").style.display === "none"
+                    ? ""
+                    : document.getElementById("turma").value,
+                turno: document.getElementById("turno").value,
+                sala: document.getElementById("sala").value,
+
+                horario: atual.horario,
+                dia: atual.dia
+            };
+
+            await fetch("{% url 'excluir_horario' %}", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+
+                body: JSON.stringify(dados)
+            });
+
+            fecharEdicao();
+
+            carregarTabela();
+        }
+
+        async function criar(e) {
+
+            e.preventDefault();
+
+            let dados = {
+
+                curso: document.getElementById("novoCurso").value,
+                ano: document.getElementById("novoAno").value,
+                turma: document.getElementById("novaTurma").style.display === "none"
+                    ? ""
+                    : document.getElementById("novaTurma").value,
+                turno: document.getElementById("novoTurno").value,
+                sala: document.getElementById("novaSala").value,
+
+                horario: document.getElementById("novoHorario").value,
+                dia: document.getElementById("novoDia").value,
+                texto: document.getElementById("novoTexto").value
+            };
+
+            await fetch("{% url 'criar_horario' %}", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+
+                body: JSON.stringify(dados)
+            });
+
+            fecharModal();
+
+            carregarTabela();
+        }
+
+        function abrirModal() {
+
+            atualizarFiltrosNovoCurso();
+
+            document.getElementById("modal").style.display = "flex";
+        }
+
+        function fecharModal() {
+
+            document.getElementById("modal").style.display = "none";
+        }
+
+        function fecharEdicao() {
+
+            document.getElementById("edicao").style.display = "none";
+        }
+
+        document
+            .getElementById("novoTurno")
+            .addEventListener("change", atualizarHorariosModal);
+
+        window.onload = () => {
+
+            atualizarFiltrosCurso();
+            atualizarFiltrosNovoCurso();
+
+            carregarTabela();
+        };
+
+    </script>
+
+</body>
+
+</html>

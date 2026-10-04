@@ -1,0 +1,832 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link
+        rel="icon"
+        href="{% static 'img/favicon.png' %}"
+        type="image/png"
+    >
+
+    <!-- CSS PRINCIPAL DO STATIC -->
+    <link
+        rel="stylesheet"
+        href="{% static 'css/estilo.css' %}"
+    >
+
+    <title>Painel Público</title>
+
+
+    <style>
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           BODY
+        ===================================================== */
+
+        body {
+
+            width: 100%;
+
+            height: 100vh;
+
+            overflow: hidden;
+
+            background: black;
+
+            font-family: Arial, sans-serif;
+        }
+
+
+        /* =====================================================
+           SLIDER
+        ===================================================== */
+
+        .slider {
+
+            display: flex;
+
+            width: 100%;
+
+            height: 100vh;
+
+            transition: transform 1s ease-in-out;
+        }
+
+
+        /* =====================================================
+           CADA TELA
+        ===================================================== */
+
+        .tela {
+
+            min-width: 100vw;
+
+            width: 100vw;
+
+            height: 100vh;
+
+            flex-shrink: 0;
+
+            background: black;
+
+            position: relative;
+        }
+
+
+        /* =====================================================
+           IFRAME
+        ===================================================== */
+
+        iframe {
+
+            display: block;
+
+            width: 100%;
+
+            height: 100%;
+
+            border: none;
+
+            background: black;
+
+            opacity: 1;
+
+            transition: opacity .5s ease;
+        }
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+body > footer {
+
+    position: fixed;
+
+    left: 45px;
+    right: 45px;
+
+    bottom: 20px;
+
+    width: auto;
+
+    height: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 25px;
+
+    z-index: 99999;
+
+    pointer-events: none;
+}
+
+
+/* =====================================================
+   INFORMAÇÕES
+===================================================== */
+
+body > footer .info {
+
+    height: 60px;
+
+    min-width: 170px;
+
+    padding: 0 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    background: #f5f5f5;
+
+    border: 3px solid #aaa;
+
+    border-radius: 10px;
+
+    color: #222;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    white-space: nowrap;
+
+    flex-shrink: 0;
+}
+
+
+/* =====================================================
+   ÍCONE
+===================================================== */
+
+body > footer .info i {
+
+    font-size: 22px;
+
+    margin-right: 3px;
+}
+
+
+/* =====================================================
+   HORA
+===================================================== */
+
+body > footer #hora {
+
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   AVISOS
+===================================================== */
+
+body > footer .marquee {
+
+    flex: 1;
+
+    min-width: 0;
+
+    height: 65px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #eeeeee;
+
+    border: 3px solid #aaa;
+
+    border-radius: 5px;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   TEXTO
+===================================================== */
+
+body > footer .marquee p {
+
+    margin: 0;
+
+    color: #222;
+
+    font-size: 23px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    white-space: nowrap;
+}
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         SLIDER
+    ===================================================== -->
+
+    <div
+        class="slider"
+        id="slider"
+    >
+
+
+        <!-- INFORMAÇÕES -->
+
+        <section class="tela">
+
+            <iframe
+                src="{% url 'info_publico' %}"
+            ></iframe>
+
+        </section>
+
+
+        <!-- EVENTOS -->
+
+        <section class="tela">
+
+            <iframe
+                src="{% url 'eventos_publico' %}"
+            ></iframe>
+
+        </section>
+
+
+        <!-- CALENDÁRIO -->
+
+        <section class="tela">
+
+            <iframe
+                src="{% url 'calendario_publico' %}"
+            ></iframe>
+
+        </section>
+
+
+        <!-- ACHADOS E PERDIDOS -->
+
+        <section class="tela">
+
+            <iframe
+                src="{% url 'achados_publico' %}"
+            ></iframe>
+
+        </section>
+
+
+        <!-- CARDÁPIO -->
+
+        <section class="tela">
+
+            <iframe
+                src="{% url 'cardapio_tv' %}"
+            ></iframe>
+
+        </section>
+
+
+        <!-- TV -->
+
+        <section class="tela">
+
+            <iframe
+                src="{% url 'tv' %}"
+            ></iframe>
+
+        </section>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ===================================================== -->
+
+    <footer>
+
+
+        <!-- =================================================
+             CLIMA + TEMPERATURA + HORA
+        ================================================= -->
+
+        <div class="info">
+
+
+            <!-- ÍCONE DO CLIMA -->
+
+            <i class="{{ clima.icone }}"></i>
+
+
+            <!-- TEMPERATURA -->
+
+            <span>
+                {{ clima.temperatura }}°C
+            </span>
+
+
+            <!-- SEPARADOR -->
+
+            <span>
+                |
+            </span>
+
+
+            <!-- HORA -->
+
+            <span id="hora"></span>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             AVISOS INSTITUCIONAIS
+        ================================================= -->
+
+        <div class="marquee">
+
+            <p>
+
+                {% for aviso in avisos %}
+
+                    {{ aviso.titulo_aviso }}
+
+                    {% if not forloop.last %}
+
+                        &nbsp; • • • &nbsp;
+
+                    {% endif %}
+
+                {% empty %}
+
+                    *AVISOS INSTITUCIONAIS
+
+                {% endfor %}
+
+            </p>
+
+        </div>
+
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
+    <script>
+
+
+        /* =====================================================
+           SLIDER
+        ===================================================== */
+
+        const slider =
+            document.getElementById("slider");
+
+
+        /* =====================================================
+           URLS DAS AULAS
+        ===================================================== */
+
+        const urlsAulas = {
+
+            TII:
+                "{% url 'pxaulasPublico' curso='TII' %}",
+
+            ADM:
+                "{% url 'pxaulasPublico' curso='ADM' %}",
+
+            ADS:
+                "{% url 'pxaulasPublico' curso='ADS' %}",
+
+            TPG:
+                "{% url 'pxaulasPublico' curso='TPG' %}"
+
+        };
+
+
+        /* =====================================================
+           CONTROLE DO SLIDER
+        ===================================================== */
+
+        let atual = 0;
+
+        let intervaloSlide = null;
+
+        const tempo = 5000;
+
+
+
+        /* =====================================================
+           OBTÉM O TURNO
+        ===================================================== */
+
+        function obterTurno() {
+
+            const agora = new Date();
+
+            const hora =
+                agora.getHours();
+
+            const minuto =
+                agora.getMinutes();
+
+
+            const totalMinutos =
+                hora * 60 + minuto;
+
+
+            const inicioManha =
+                7 * 60;
+
+            const fimManha =
+                12 * 60;
+
+
+            const inicioTarde =
+                13 * 60;
+
+            const fimTarde =
+                18 * 60 + 30;
+
+
+            const inicioNoite =
+                19 * 60;
+
+            const fimNoite =
+                23 * 60 + 30;
+
+
+            if (
+
+                (
+                    totalMinutos >= inicioManha &&
+                    totalMinutos < fimManha
+                )
+
+                ||
+
+                (
+                    totalMinutos >= inicioTarde &&
+                    totalMinutos < fimTarde
+                )
+
+            ) {
+
+                return "dia";
+
+            }
+
+
+            if (
+
+                totalMinutos >= inicioNoite &&
+                totalMinutos < fimNoite
+
+            ) {
+
+                return "noite";
+
+            }
+
+
+            return "fora";
+
+        }
+
+
+
+        /* =====================================================
+           CRIA TELA DE AULA
+        ===================================================== */
+
+        function criarTela(url) {
+
+            const section =
+                document.createElement("section");
+
+
+            section.classList.add("tela");
+
+            section.classList.add("tela-aula");
+
+
+            section.innerHTML = `
+
+                <iframe src="${url}"></iframe>
+
+            `;
+
+
+            return section;
+
+        }
+
+
+
+        /* =====================================================
+           MONTA TELAS DE AULAS
+        ===================================================== */
+
+        function montarTelasAulas() {
+
+
+            document
+                .querySelectorAll(".tela-aula")
+                .forEach(
+                    tela => tela.remove()
+                );
+
+
+            const turno =
+                obterTurno();
+
+
+            if (turno === "dia") {
+
+
+                slider.appendChild(
+                    criarTela(urlsAulas.TII)
+                );
+
+
+                slider.appendChild(
+                    criarTela(urlsAulas.ADM)
+                );
+
+
+            }
+
+
+            else if (turno === "noite") {
+
+
+                slider.appendChild(
+                    criarTela(urlsAulas.ADS)
+                );
+
+
+                slider.appendChild(
+                    criarTela(urlsAulas.TPG)
+                );
+
+            }
+
+
+            reiniciarSlider();
+
+        }
+
+
+
+        /* =====================================================
+           REINICIA SLIDER
+        ===================================================== */
+
+        function reiniciarSlider() {
+
+
+            if (intervaloSlide) {
+
+                clearInterval(
+                    intervaloSlide
+                );
+
+            }
+
+
+            document
+                .querySelectorAll(".clone")
+                .forEach(
+                    clone => clone.remove()
+                );
+
+
+            const slides =
+                document.querySelectorAll(".tela");
+
+
+            if (slides.length === 0) {
+
+                return;
+
+            }
+
+
+            const primeiroClone =
+                slides[0].cloneNode(true);
+
+
+            primeiroClone.classList.add("clone");
+
+
+            slider.appendChild(
+                primeiroClone
+            );
+
+
+            atual = 0;
+
+
+            slider.style.transition =
+                "none";
+
+
+            slider.style.transform =
+                "translateX(0vw)";
+
+
+            setTimeout(() => {
+
+                slider.style.transition =
+                    "transform 1s ease-in-out";
+
+            }, 50);
+
+
+            const total =
+                document.querySelectorAll(".tela").length;
+
+
+            intervaloSlide =
+                setInterval(() => {
+
+
+                    atual++;
+
+
+                    slider.style.transition =
+                        "transform 1s ease-in-out";
+
+
+                    slider.style.transform =
+                        `translateX(-${atual * 100}vw)`;
+
+
+                    if (
+                        atual === total - 1
+                    ) {
+
+
+                        setTimeout(() => {
+
+
+                            slider.style.transition =
+                                "none";
+
+
+                            atual = 0;
+
+
+                            slider.style.transform =
+                                "translateX(0vw)";
+
+
+                        }, 1000);
+
+                    }
+
+
+                }, tempo);
+
+        }
+
+
+
+        /* =====================================================
+           ATUALIZA HORA
+        ===================================================== */
+
+        function atualizarHora() {
+
+            const agora =
+                new Date();
+
+
+            document.getElementById("hora").innerHTML =
+
+                agora.toLocaleTimeString(
+
+                    "pt-BR",
+
+                    {
+
+                        hour: "2-digit",
+
+                        minute: "2-digit"
+
+                    }
+
+                );
+
+        }
+
+
+        setInterval(
+            atualizarHora,
+            1000
+        );
+
+
+        atualizarHora();
+
+
+
+        /* =====================================================
+           INICIALIZA
+        ===================================================== */
+
+        montarTelasAulas();
+
+
+        /* =====================================================
+           ATUALIZA TURNO A CADA MINUTO
+        ===================================================== */
+
+        setInterval(
+            montarTelasAulas,
+            60000
+        );
+
+
+
+        /* =====================================================
+           RECARREGA IFRAMES
+        ===================================================== */
+
+        setInterval(() => {
+
+
+            document
+                .querySelectorAll("iframe")
+                .forEach(frame => {
+
+
+                    try {
+
+                        frame.contentWindow.location.reload();
+
+                    }
+
+                    catch (erro) {
+
+                        console.log(
+                            "Não foi possível recarregar iframe:",
+                            erro
+                        );
+
+                    }
+
+                });
+
+
+        }, 10000);
+
+
+    </script>
+
+
+</body>
+
+</html>

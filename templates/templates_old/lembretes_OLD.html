@@ -1,0 +1,377 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Lembretes</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#e5e5e5;
+}
+
+/* TOPO */
+
+header{
+    background:#8358A5;
+    height:90px;
+    display:flex;
+    align-items:center;
+    padding:0 25px;
+}
+
+.logo{
+    width:220px;
+}
+
+header h1{
+    flex:1;
+    text-align:center;
+    color:white;
+    font-size:50px;
+    font-weight:bold;
+    margin-right:220px;
+}
+
+/* CONTEÚDO */
+
+main{
+    width:90%;
+    height:calc(100vh - 90px);
+    margin:0 auto;
+    padding-top:20px;
+    position:relative;
+}
+
+/* GRID */
+
+.container{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+/* CARD */
+
+.card{
+    background:#f8f8f8;
+    border:2px solid #9b6cc0;
+    padding:12px;
+}
+
+.card-grande{
+    grid-column:1 / 3;
+    height:165px;
+}
+
+.card:not(.card-grande){
+    height:242px;
+}
+
+.card h2{
+    font-size:28px;
+    color:#222;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+.card p{
+    margin-top:8px;
+    color:#222;
+    font-size:18px;
+    font-weight:bold;
+    line-height:1.35;
+
+    display:-webkit-box;
+    -webkit-line-clamp:4;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+
+.card small{
+    display:block;
+    margin-top:10px;
+    color:#555;
+    font-size:15px;
+    font-weight:bold;
+}
+
+/* AJUSTE COM MUITOS LEMBRETES */
+
+.container.total-many{
+    gap:12px;
+}
+
+.container.total-many .card-grande{
+    height:135px;
+}
+
+.container.total-many .card:not(.card-grande){
+    height:180px;
+}
+
+.container.total-many .card h2{
+    font-size:22px;
+}
+
+.container.total-many .card p{
+    font-size:15px;
+    -webkit-line-clamp:3;
+}
+
+.container.total-many .card small{
+    font-size:13px;
+}
+
+/* SEM REGISTROS */
+
+.vazio{
+    grid-column:1 / -1;
+    text-align:center;
+    color:#222;
+    font-size:26px;
+    font-weight:bold;
+}
+
+/* RODAPÉ */
+
+footer{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:45px;
+
+    display:flex;
+    gap:30px;
+    align-items:center;
+}
+
+.info{
+    width:155px;
+    height:42px;
+
+    background:#f8f8f8;
+    border:2px solid #9b6cc0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    color:#8358A5;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.marquee{
+    flex:1;
+    height:45px;
+
+    background:#8358A5;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    overflow:hidden;
+    position:relative;
+}
+
+.marquee p{
+    position:absolute;
+    white-space:nowrap;
+
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+
+    animation:rolar 25s linear infinite;
+}
+
+@keyframes rolar{
+    from{
+        transform:translateX(100%);
+    }
+
+    to{
+        transform:translateX(-100%);
+    }
+}
+
+/* RESPONSIVO */
+
+@media(max-width:900px){
+    html,
+    body{
+        overflow:auto;
+    }
+
+    header{
+        flex-direction:column;
+        height:auto;
+        padding:15px;
+    }
+
+    header h1{
+        margin-right:0;
+        font-size:34px;
+        margin-top:10px;
+    }
+
+    main{
+        height:auto;
+        padding-bottom:130px;
+    }
+
+    .container,
+    .container.total-many{
+        grid-template-columns:1fr;
+    }
+
+    .card-grande{
+        grid-column:auto;
+    }
+
+    .card,
+    .card-grande,
+    .card:not(.card-grande),
+    .container.total-many .card-grande,
+    .container.total-many .card:not(.card-grande){
+        height:auto;
+        min-height:160px;
+    }
+
+    footer{
+        position:fixed;
+        left:15px;
+        right:15px;
+        bottom:15px;
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .info,
+    .marquee{
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <img
+    class="logo"
+    src="{% static 'img/logoif.png.png' %}"
+    alt="Logo IFRS">
+
+    <h1>LEMBRETES</h1>
+
+</header>
+
+<main>
+
+    <div
+    class="container
+    {% if lembretes|length > 3 %}
+        total-many
+    {% endif %}
+    ">
+
+        {% for lembrete in lembretes %}
+
+        <div class="card {% if forloop.first %}card-grande{% endif %}">
+
+            <h2>
+                {{ lembrete.titulo_lembrete }}
+            </h2>
+
+            {% if lembrete.conteudo_lembrete %}
+            <p>
+                {{ lembrete.conteudo_lembrete }}
+            </p>
+            {% endif %}
+
+            <small>
+                Expira em:
+                {{ lembrete.data_expi }}
+            </small>
+
+        </div>
+
+        {% empty %}
+
+        <div class="vazio">
+            Nenhum lembrete cadastrado.
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <footer>
+
+        <div class="info">
+            <span id="hora"></span>
+            &nbsp;|&nbsp;
+            <span id="temperatura">20°</span>
+        </div>
+
+        <div class="marquee">
+
+            <p>
+                {% for aviso in avisos %}
+
+                    {{ aviso.titulo_aviso }}
+
+                    {% if not forloop.last %}
+                        • • •
+                    {% endif %}
+
+                {% empty %}
+
+                    *AVISOS INSTITUCIONAIS
+
+                {% endfor %}
+            </p>
+
+        </div>
+
+    </footer>
+
+</main>
+
+<script>
+function atualizarHora(){
+    const agora = new Date();
+
+    document.getElementById("hora").innerHTML =
+    agora.toLocaleTimeString(
+        "pt-BR",
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+}
+
+setInterval(atualizarHora,1000);
+atualizarHora();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,225 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Próximas Aulas - Análise e Desenvolvimento de Sistemas</title>
+<link rel="stylesheet" href="{% static 'css/estilo.css' %}">
+<style>
+header{
+    background:#882020;
+}
+h2{
+    font-size: 40px;
+    color: #222;
+    text-align: center;
+    font-weight: bold;
+}
+main section{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap:8% 10%;
+    margin: 0 3%;
+}
+.turma{
+    background: white;
+    border: 5px solid #590909;
+    display:flex;
+    position:relative;
+    height: 110px;
+}
+.turma p{
+    font-size:30px;
+    font-weight:bold;
+    color:#222;
+    align-content: center;
+    justify-content: center;
+}
+.aula{
+    width: 55%;
+    text-align: center;
+}
+.sala{
+    width: 20%;
+    text-align: end;
+    padding: 2%;
+}
+h3{
+    background: #590909;
+    color: white;
+    align-items: center;
+    padding: 5%;
+    font-size:40px;
+    font-weight:bold;
+    display:flex;
+    width:20%;
+    clip-path: polygon(0 0, 100% 0%, 80% 100%, 0 100%);
+}
+
+</style>
+</head>
+<body>
+
+    <header>
+
+        <img src="{% static 'img/logoif.png.png' %}" alt="Logo IFRS" class="logo">
+
+        <h1>PRÓXIMAS AULAS</h1>
+
+    </header>
+
+    <main>
+
+        <h2>
+            ADMINISTRAÇÃO<br>
+    <span id="proximoHorario"></span>
+        </h2>
+
+        <section id="tabelaAulas">
+
+        </section>
+
+    </main>
+
+<script>
+async function carregarAulas() {
+
+    try {
+
+        const resposta = await fetch(
+            "/pxaulas/api/proximas-aulas/ADM/"
+        );
+
+        if (!resposta.ok) {
+            throw new Error(
+                `Erro HTTP: ${resposta.status}`
+            );
+        }
+
+        const retorno = await resposta.json();
+
+        console.log("Resposta API:", retorno);
+
+        document.getElementById(
+            "proximoHorario"
+        ).textContent = retorno.horario ?? "";
+
+        const tabela =
+            document.getElementById("tabelaAulas");
+
+        tabela.innerHTML = "";
+
+
+        if (
+            !retorno.dados ||
+            retorno.dados.length === 0
+        ) {
+
+            tabela.classList.remove(
+                "duas-colunas"
+            );
+
+            tabela.innerHTML = `
+                <div class="vazio">
+                    Nenhuma próxima aula encontrada.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        retorno.dados.sort((a, b) =>
+            String(a.turma).localeCompare(
+                String(b.turma),
+                "pt-BR",
+                {
+                    numeric: true,
+                    sensitivity: "base"
+                }
+            )
+        );
+
+
+        const possuiTurmaB =
+            retorno.dados.some(item =>
+                String(item.turma || "")
+                    .toUpperCase()
+                    .includes("B")
+            );
+
+
+        if (possuiTurmaB) {
+
+            tabela.classList.add(
+                "duas-colunas"
+            );
+
+        } else {
+
+            tabela.classList.remove(
+                "duas-colunas"
+            );
+
+        }
+
+
+retorno.dados.forEach(item => {
+
+    const turmaOriginal = String(item.turma || "").trim().toUpperCase();
+    const numero = turmaOriginal.match(/\d+/)?.[0] || "";
+    const letra = turmaOriginal.match(/[AB]$/)?.[0] || "";
+    const turma = [numero ? `${numero}\u00ba` : "", letra]
+        .filter(Boolean)
+        .join(" ");
+
+    tabela.innerHTML += `
+        <article class="turma">
+
+            <h3>${turma}</h3>
+
+            <p class="aula">
+                ${item.materia}
+            </p>
+
+            <p class="sala">
+                ${item.sala}
+            </p>
+
+        </article>
+    `;
+});
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar aulas:",
+            erro
+        );
+
+        document.getElementById(
+            "tabelaAulas"
+        ).innerHTML = `
+
+            <div class="vazio">
+                Erro ao carregar as próximas aulas.
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+carregarAulas();
+
+setInterval(
+    carregarAulas,
+    60000
+);
+</script>
+</body>
+</html>

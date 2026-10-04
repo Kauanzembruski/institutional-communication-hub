@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+<link rel="icon" type="image/x-icon" href="logoif.png">
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    background: url("fundo.jpg") no-repeat center center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* caixa externa */
+section {
+    background: #0b6b2e;
+    padding: 25px;
+    border-radius: 10px;
+    position: relative;
+}
+
+/* título */
+h2 {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    margin: 0;
+    font-size: 28px;
+}
+
+/* card */
+form {
+    background: #2ea043;
+    width: 320px;
+    padding: 70px 25px 25px;
+    border-radius: 25px;
+    position: relative;
+}
+
+/* avatar (apenas UM círculo) */
+form::after {
+    font-size: 35px;
+    color: #0b6b2e;
+    width: 80px;
+    height: 80px;
+    background: #cfead6;
+    border-radius: 50%;
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* campos */
+label {
+    display: block;
+    color: white;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+input {
+    width: 100%;
+    padding: 6px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 3px;
+}
+
+/* link */
+.link {
+    display: block;
+    font-size: 12px;
+    color: white;
+    margin: 8px 0;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.link:hover {
+    color: red;
+}
+
+/* botões */
+button {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    border-radius: 20px;
+    border: none;
+    background: #dcdcdc;
+    cursor: pointer;
+}
+
+button:last-of-type {
+    width: 90px;
+    border-radius: 4px;
+    background: #eee;
+    display: block;
+    margin: 10px auto 0;
+}
+</style>
+
+</head>
+<body>
+
+    <section>
+        <h2>Fazer Login</h2>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <label>E-mail:</label>
+
+            <input type="email" name="email" required>
+
+            <label>Senha:</label>
+
+            <input type="password" name="senha" required>
+
+            <button type="submit">
+                ENVIAR
+            </button>
+
+        </form>
+    </section>
+
+</body>
+
+</html>

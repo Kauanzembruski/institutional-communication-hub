@@ -1,0 +1,973 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+
+    <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
+
+    <title>Painel Público</title>
+
+
+    <style>
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           BODY
+        ===================================================== */
+
+        body {
+
+            width: 100%;
+
+            height: 100vh;
+
+            overflow: hidden;
+
+            background: #eeeeee;
+
+            font-family: Arial, sans-serif;
+        }
+
+
+        /* =====================================================
+           SLIDER
+        ===================================================== */
+
+        .slider {
+
+            display: flex;
+
+            width: 100%;
+
+            /* Reserva o espaço do footer fixo para que o conteúdo
+               dos iframes nunca fique atrás dele. */
+            height: calc(100vh - 110px);
+
+            transition: transform 1s ease-in-out;
+        }
+
+
+        /* =====================================================
+           CADA TELA
+        ===================================================== */
+
+        .tela {
+
+            min-width: 100vw;
+
+            width: 100vw;
+
+            /* Mesma área útil do slider, acima do footer. */
+            height: calc(100vh - 110px);
+
+            flex-shrink: 0;
+
+            background: black;
+
+            position: relative;
+        }
+
+
+        /* =====================================================
+           IFRAME
+        ===================================================== */
+
+        iframe {
+
+            display: block;
+
+            width: 100%;
+
+            height: 100%;
+
+            border: none;
+
+            background: black;
+
+            opacity: 1;
+
+            transition: opacity .5s ease;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        body>footer {
+
+            position: fixed;
+
+            left: 45px;
+
+            right: 45px;
+
+            bottom: 20px;
+
+            width: auto;
+
+            height: 70px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 25px;
+
+            z-index: 99999;
+
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           BLOCO CLIMA / HORA
+        ===================================================== */
+
+        body>footer .info {
+
+            height: 60px;
+
+            min-width: 170px;
+
+            padding: 0 15px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            background: #f5f5f5;
+
+            border: 3px solid #aaa;
+
+            border-radius: 10px;
+
+            color: #222;
+
+            font-size: 20px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+
+            flex-shrink: 0;
+        }
+
+
+        body>footer .info i {
+
+            font-size: 22px;
+
+            margin-right: 3px;
+        }
+
+
+        body>footer #hora {
+
+            font-weight: bold;
+        }
+
+
+        /* =====================================================
+           ÁREA DOS AVISOS
+        ===================================================== */
+
+        body>footer .marquee {
+
+            flex: 1;
+
+            min-width: 0;
+
+            height: 65px;
+
+            display: flex;
+
+            align-items: center;
+
+            background: #eeeeee;
+
+            border: 3px solid #aaa;
+
+            border-radius: 5px;
+
+            overflow: hidden;
+
+            position: relative;
+        }
+
+
+        /* =====================================================
+           TEXTO DOS AVISOS
+        ===================================================== */
+
+        body>footer .marquee p {
+
+            margin: 0;
+
+            color: #222;
+
+            font-size: 23px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+
+            display: inline-block;
+
+            padding-left: 100%;
+
+            animation: passarAvisos 30s linear infinite;
+
+            will-change: transform;
+        }
+
+
+        /* =====================================================
+           ANIMAÇÃO DOS AVISOS
+        ===================================================== */
+
+        @keyframes passarAvisos {
+
+            0% {
+
+                transform: translateX(0);
+
+            }
+
+            100% {
+
+                transform: translateX(-100%);
+
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         SLIDER PRINCIPAL
+    ===================================================== -->
+
+    <div class="slider" id="slider">
+
+
+        <!-- INFORMAÇÕES OPERACIONAIS -->
+
+        <section class="tela">
+
+            <iframe src="{% url 'info_publico' %}"></iframe>
+
+        </section>
+
+
+        <!-- EVENTOS -->
+	{% if tem_eventos %}
+        <section class="tela">
+
+            <iframe src="{% url 'eventos_publico' %}"></iframe>
+
+        </section>
+	{% endif %}
+
+        <!-- CALENDÁRIO -->
+
+        <section class="tela">
+
+            <iframe src="{% url 'calendario_publico' %}"></iframe>
+
+        </section>
+
+
+        <!-- ACHADOS E PERDIDOS -->
+
+        <section class="tela">
+
+            <iframe src="{% url 'achados_publico' %}"></iframe>
+
+        </section>
+
+
+        <!-- CARDÁPIO -->
+
+        <section class="tela">
+
+            <iframe src="{% url 'cardapio_tv' %}"></iframe>
+
+        </section>
+
+
+        <!-- LEMBRETES -->
+	{% if tem_lembretes %}
+        <section class="tela">
+
+            <iframe src="{% url 'tv' %}"></iframe>
+
+        </section>
+	{% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER
+    ===================================================== -->
+
+    <footer>
+
+
+        <!-- =================================================
+             CLIMA + TEMPERATURA + HORA
+        ================================================= -->
+
+        <div class="info">
+
+
+            <!-- ÍCONE DO CLIMA -->
+
+            {% if clima.icone %}
+
+            <i class="{{ clima.icone }}"></i>
+
+            {% endif %}
+
+
+            <!-- TEMPERATURA -->
+
+            <span>
+
+                {% if clima.temperatura != "--" %}
+
+                {{ clima.temperatura }}°C
+
+                {% else %}
+
+                --°C
+
+                {% endif %}
+
+            </span>
+
+
+            <!-- SEPARADOR -->
+
+            <span>
+                |
+            </span>
+
+
+            <!-- HORA -->
+
+            <span id="hora"></span>
+
+
+        </div>
+
+
+        <!-- =================================================
+             AVISOS INSTITUCIONAIS
+        ================================================= -->
+
+        <div class="marquee">
+
+            <p>
+
+                {% for aviso in avisos %}
+
+                {{ aviso.titulo_aviso }}
+
+                {% if not forloop.last %}
+
+                &nbsp;&nbsp;&nbsp; • • • &nbsp;&nbsp;&nbsp;
+
+                {% endif %}
+
+                {% empty %}
+
+                *AVISOS INSTITUCIONAIS
+
+                {% endfor %}
+
+            </p>
+
+        </div>
+
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
+    <script>
+
+
+        /* =====================================================
+           SLIDER
+        ===================================================== */
+
+        const slider =
+            document.getElementById("slider");
+
+
+        /* =====================================================
+           URLS DAS AULAS
+        ===================================================== */
+
+        const urlsAulas = {
+
+            TII:
+                "{% url 'pxaulasPublico' curso='TII' %}",
+
+            ADM:
+                "{% url 'pxaulasPublico' curso='ADM' %}",
+
+            ADS:
+                "{% url 'pxaulasPublico' curso='ADS' %}",
+
+            TPG:
+                "{% url 'pxaulasPublico' curso='TPG' %}"
+
+        };
+
+
+        /* =====================================================
+           CONTROLE DO SLIDER
+        ===================================================== */
+
+        let atual = 0;
+
+        let intervaloSlide = null;
+
+        const tempo = 5000;
+
+
+        /* =====================================================
+           OBTÉM O TURNO
+        ===================================================== */
+
+        function obterTurno() {
+
+            const agora =
+                new Date();
+
+            const hora =
+                agora.getHours();
+
+            const minuto =
+                agora.getMinutes();
+
+
+            const totalMinutos =
+                hora * 60 + minuto;
+
+
+            const inicioManha =
+                7 * 60;
+
+            const fimManha =
+                12 * 60;
+
+
+            const inicioTarde =
+                13 * 60;
+
+            const fimTarde =
+                18 * 60 + 30;
+
+
+            const inicioNoite =
+                19 * 60;
+
+            const fimNoite =
+                23 * 60 + 30;
+
+
+            if (
+
+                (
+
+                    totalMinutos >= inicioManha &&
+
+                    totalMinutos < fimManha
+
+                )
+
+                ||
+
+                (
+
+                    totalMinutos >= inicioTarde &&
+
+                    totalMinutos < fimTarde
+
+                )
+
+            ) {
+
+                return "dia";
+
+            }
+
+
+            if (
+
+                totalMinutos >= inicioNoite &&
+
+                totalMinutos < fimNoite
+
+            ) {
+
+                return "noite";
+
+            }
+
+
+            return "fora";
+
+        }
+
+
+        /* =====================================================
+           CRIA UMA TELA DE AULA
+        ===================================================== */
+
+        function criarTela(url) {
+
+            const section =
+                document.createElement("section");
+
+
+            section.classList.add(
+                "tela"
+            );
+
+            section.classList.add(
+                "tela-aula"
+            );
+
+
+            section.innerHTML = `
+
+                <iframe
+                    src="${url}"
+                ></iframe>
+
+            `;
+
+
+            return section;
+
+        }
+
+
+        /* =====================================================
+           MONTA AS TELAS DE AULAS
+        ===================================================== */
+
+        function montarTelasAulas() {
+
+
+            document
+                .querySelectorAll(
+                    ".tela-aula"
+                )
+                .forEach(
+                    tela => tela.remove()
+                );
+
+
+            const turno =
+                obterTurno();
+
+
+            /*
+            =========================================
+            MANHÃ / TARDE
+            =========================================
+            */
+
+            if (turno === "dia") {
+
+
+                slider.appendChild(
+
+                    criarTela(
+                        urlsAulas.TII
+                    )
+
+                );
+
+
+                slider.appendChild(
+
+                    criarTela(
+                        urlsAulas.ADM
+                    )
+
+                );
+
+
+            }
+
+
+            /*
+            =========================================
+            NOITE
+            =========================================
+            */
+
+            else if (
+                turno === "noite"
+            ) {
+
+
+                slider.appendChild(
+
+                    criarTela(
+                        urlsAulas.ADS
+                    )
+
+                );
+
+
+                slider.appendChild(
+
+                    criarTela(
+                        urlsAulas.TPG
+                    )
+
+                );
+
+
+            }
+
+
+            reiniciarSlider();
+
+        }
+
+
+        /* =====================================================
+           REINICIA O SLIDER
+        ===================================================== */
+
+        function reiniciarSlider() {
+
+
+            /*
+            LIMPA INTERVALO ANTIGO
+            */
+
+            if (intervaloSlide) {
+
+                clearInterval(
+                    intervaloSlide
+                );
+
+            }
+
+
+            /*
+            REMOVE CLONES ANTIGOS
+            */
+
+            document
+                .querySelectorAll(
+                    ".clone"
+                )
+                .forEach(
+                    clone => clone.remove()
+                );
+
+
+            /*
+            PEGA TODAS AS TELAS
+            */
+
+            const slides =
+                document.querySelectorAll(
+                    ".tela"
+                );
+
+
+            if (
+                slides.length === 0
+            ) {
+
+                return;
+
+            }
+
+
+            /*
+            CRIA CLONE DA PRIMEIRA TELA
+            PARA DEIXAR A TRANSIÇÃO CONTÍNUA
+            */
+
+            const primeiroClone =
+                slides[0].cloneNode(
+                    true
+                );
+
+
+            primeiroClone.classList.add(
+                "clone"
+            );
+
+
+            slider.appendChild(
+                primeiroClone
+            );
+
+
+            /*
+            VOLTA PARA PRIMEIRA TELA
+            */
+
+            atual = 0;
+
+
+            slider.style.transition =
+                "none";
+
+
+            slider.style.transform =
+                "translateX(0vw)";
+
+
+            setTimeout(() => {
+
+                slider.style.transition =
+                    "transform 1s ease-in-out";
+
+            }, 50);
+
+
+            /*
+            TOTAL DE SLIDES
+            INCLUINDO CLONE
+            */
+
+            const total =
+                document.querySelectorAll(
+                    ".tela"
+                ).length;
+
+
+            /*
+            INICIA SLIDER
+            */
+
+            intervaloSlide =
+                setInterval(() => {
+
+
+                    atual++;
+
+
+                    slider.style.transition =
+                        "transform 1s ease-in-out";
+
+
+                    slider.style.transform =
+                        `translateX(-${atual * 100}vw)`;
+
+
+                    /*
+                    CHEGOU NO CLONE
+                    */
+
+                    if (
+                        atual === total - 1
+                    ) {
+
+
+                        setTimeout(() => {
+
+
+                            slider.style.transition =
+                                "none";
+
+
+                            atual = 0;
+
+
+                            slider.style.transform =
+                                "translateX(0vw)";
+
+
+                            /*
+                            RESTAURA A ANIMAÇÃO
+                            */
+
+                            setTimeout(() => {
+
+                                slider.style.transition =
+                                    "transform 1s ease-in-out";
+
+                            }, 50);
+
+
+                        }, 1000);
+
+                    }
+
+
+                }, tempo);
+
+        }
+
+
+        /* =====================================================
+           ATUALIZA A HORA
+        ===================================================== */
+
+        function atualizarHora() {
+
+            const agora =
+                new Date();
+
+
+            const elementoHora =
+                document.getElementById(
+                    "hora"
+                );
+
+
+            if (!elementoHora) {
+
+                return;
+
+            }
+
+
+            elementoHora.innerHTML =
+
+                agora.toLocaleTimeString(
+
+                    "pt-BR",
+
+                    {
+
+                        hour:
+                            "2-digit",
+
+                        minute:
+                            "2-digit"
+
+                    }
+
+                );
+
+        }
+
+
+        setInterval(
+            atualizarHora,
+            1000
+        );
+
+
+        atualizarHora();
+
+
+        /* =====================================================
+           INICIALIZA TELAS DE AULA
+        ===================================================== */
+
+        montarTelasAulas();
+
+
+        /* =====================================================
+           ATUALIZA O TURNO A CADA MINUTO
+        ===================================================== */
+
+        setInterval(
+
+            montarTelasAulas,
+
+            60000
+
+        );
+
+
+        /* =====================================================
+           RECARREGA OS IFRAMES
+        ===================================================== */
+
+        setInterval(() => {
+
+
+            document
+                .querySelectorAll(
+                    "iframe"
+                )
+                .forEach(
+                    frame => {
+
+
+                        try {
+
+
+                            frame.contentWindow
+                                .location
+                                .reload();
+
+
+                        }
+
+                        catch (erro) {
+
+
+                            console.log(
+
+                                "Não foi possível recarregar iframe:",
+
+                                erro
+
+                            );
+
+
+                        }
+
+
+                    }
+                );
+
+
+        }, 60000);
+
+
+    </script>
+
+
+</body>
+
+</html>

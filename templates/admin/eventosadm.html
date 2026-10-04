@@ -1,0 +1,732 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Eventos</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #ffffff;
+            margin: 0;
+        }
+
+        /* HEADER */
+        nav {
+            height: 78px;
+            background: #929292;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        /* LAYOUT */
+        main {
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .container {
+            width: calc(100% - 560px);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        /* CARD */
+        .evento-card {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 15px;
+            background: #eee;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .evento-card img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .conteudo h1 {
+            margin: 0;
+            font-size: 16px;
+            color: #000;
+        }
+
+        .conteudo p {
+            font-size: 13px;
+            color: #000;
+        }
+
+        .evento-passado h1,
+        .evento-passado p {
+            color: #000;
+        }
+
+        /* PESQUISA AVANÇADA */
+        aside {
+            position: fixed;
+            right: 20px;
+            top: 90px;
+            width: 500px;
+            background: #e9e9e9;
+            padding: 28px 20px 18px;
+            border-radius: 12px;
+        }
+
+        aside form {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        aside h1 {
+            margin: 0 0 34px 0;
+            font-size: 31px;
+            line-height: 1.05;
+            color: #000;
+            white-space: nowrap;
+        }
+
+        aside label {
+            display: block;
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            color: #000;
+        }
+
+        aside input[type="text"],
+        aside input[type="date"] {
+            width: 100%;
+            height: 37px;
+            padding: 8px 10px;
+            margin: 0 0 32px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #fff;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        aside .pesquisar {
+            width: 100%;
+            height: 33px;
+            border: none;
+            border-radius: 7px;
+            background: #3949ab;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: -10px;
+        }
+
+        /* BOTÃO + */
+        .btn-add {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 65px;
+            height: 65px;
+            font-size: 35px;
+            background: #a8aab5;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-conteudo {
+            position: relative;
+            background: white;
+            padding: 25px;
+            width: 350px;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            box-sizing: border-box;
+        }
+
+        .modal-conteudo input,
+        .modal-conteudo textarea,
+        .modal-conteudo button {
+            margin-top: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .modal-conteudo button {
+            background: #a8aab5;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .fechar {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 25px;
+        }
+
+        .btn-excluir {
+            background: #d62828 !important;
+            color: white;
+        }
+
+        /* RESPONSIVO */
+        @media (max-width: 1100px) {
+            .container {
+                width: calc(100% - 400px);
+                grid-template-columns: 1fr;
+            }
+
+            aside {
+                width: 360px;
+            }
+
+            aside h1 {
+                white-space: normal;
+            }
+        }
+
+        @media (max-width: 800px) {
+            main {
+                flex-direction: column;
+            }
+
+            .container {
+                width: 100%;
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            aside {
+                position: static;
+                width: calc(100% - 40px);
+                margin: 0 20px 20px;
+            }
+        }
+    </style>
+
+</head>
+
+<body class="eventosadm">
+
+    <header>
+        <nav class="inicial">
+
+            <a href="{% url 'painel' %}">
+                Voltar
+            </a>
+
+
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="container" id="container">
+
+            {% for evento in eventos %}
+
+            <section class="evento-card" data-id="{{ evento.id_evento }}"
+                data-datafim="{{ evento.data_fim|date:'Y-m-d' }}">
+
+                <input type="radio" name="evento" onclick="abrirModalEditar(this)">
+
+                {% if evento.imagem %}
+                <img src="{{ evento.imagem.url }}">
+                {% else %}
+                <img src="{% static 'img/GD_imgSemImagem.png' %}">
+                {% endif %}
+
+                <section class="conteudo">
+
+                    <h1>{{ evento.titulo }}</h1>
+
+                    <p>{{ evento.descricao }}</p>
+
+                    <p>
+                        {{ evento.data_inicio|date:"d/m/Y" }} até {{ evento.data_fim|date:"d/m/Y" }}
+                    </p>
+
+                    <p>
+                        {{ evento.hora_inicio|time:"H:i" }} às {{ evento.hora_fim|time:"H:i" }}
+                    </p>
+
+                </section>
+
+            </section>
+
+            {% empty %}
+
+            <p>Nenhum evento cadastrado.</p>
+
+            {% endfor %}
+
+        </section>
+
+
+        <aside>
+            <form method="GET">
+                <h1>Pesquisa Avançada</h1>
+
+                <label>Título:</label>
+                <input type="text" name="titulo" value="{{ titulo|default:'' }}">
+
+                <label>Data início:</label>
+                <input type="date" name="data_inicio" value="{{ data_inicio|default:'' }}">
+
+                <label>Data final:</label>
+                <input type="date" name="data_fim" value="{{ data_fim|default:'' }}">
+
+                <button class="pesquisar" type="submit">
+                    Pesquisar Evento
+                </button>
+            </form>
+        </aside>
+
+
+    </main>
+
+    <section id="modalEditar" class="modal">
+
+        <section class="modal-conteudo">
+
+            <h2>Editar evento</h2>
+
+            <label>Título</label>
+            <input type="text" id="tituloeditar">
+
+            <br><br>
+
+            <label>Descrição</label>
+            <textarea id="descricaoeditar"></textarea>
+
+            <br><br>
+
+            <label>Data início</label>
+            <input type="date" id="datainicioeditar">
+
+            <br><br>
+
+            <label>Data fim</label>
+            <input type="date" id="datafimeditar">
+
+            <br><br>
+
+            <label>Horário início</label>
+            <input type="time" id="horainicioeditar">
+
+            <br><br>
+
+            <label>Horário fim</label>
+            <input type="time" id="horafimeditar">
+
+            <br><br>
+
+            <label>Imagem</label>
+            <input type="file" id="imagemeditar" accept="image/*">
+
+            <br><br>
+
+            <button onclick="salvarEvento()">Salvar</button>
+
+            <button class="btn-excluir" onclick="excluirEvento()">Excluir</button>
+
+            <button onclick="fecharModalEditar()">Cancelar</button>
+
+        </section>
+
+    </section>
+
+    <button class="btn-add" onclick="abrirModalAdd()">+</button>
+
+    <section id="modalAdd" class="modal">
+
+        <section class="modal-conteudo">
+
+            <span class="fechar" onclick="fecharModalAdd()">&times;</span>
+
+            <h2>Novo evento</h2>
+
+            <form onsubmit="criarEvento(event)">
+
+                <label>Título</label>
+                <input type="text" id="titulocriar" required>
+
+                <br><br>
+
+                <label>Descrição</label>
+                <textarea id="descricaocriar" required></textarea>
+
+                <br><br>
+
+                <label>Data início</label>
+                <input type="date" id="datainiciocriar" required>
+
+                <br><br>
+
+                <label>Data fim</label>
+                <input type="date" id="datafimcriar" required>
+
+                <br><br>
+
+                <label>Horário início</label>
+                <input type="time" id="horainiciocriar" required>
+
+                <br><br>
+
+                <label>Horário fim</label>
+                <input type="time" id="horafimcriar" required>
+
+                <br><br>
+
+                <label>Imagem</label>
+                <input type="file" id="imagemcriar" accept="image/*">
+
+                <br><br>
+
+                <button type="submit">
+                    Criar Evento
+                </button>
+
+            </form>
+
+        </section>
+
+    </section>
+
+    {% csrf_token %}
+    <script>
+
+        let cardAtual = null;
+
+        let hoje =
+            new Date()
+                .toISOString()
+                .split("T")[0];
+
+        document.getElementById("datainiciocriar").min = hoje;
+        document.getElementById("datafimcriar").min = hoje;
+        document.getElementById("datainicioeditar").min = hoje;
+        document.getElementById("datafimeditar").min = hoje;
+
+        document
+            .getElementById("datainiciocriar")
+            .addEventListener("change", function () {
+
+                document
+                    .getElementById("datafimcriar")
+                    .min = this.value;
+
+            });
+
+        document
+            .getElementById("datainicioeditar")
+            .addEventListener("change", function () {
+
+                document
+                    .getElementById("datafimeditar")
+                    .min = this.value;
+
+            });
+
+
+        function getCSRFToken() {
+            return document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+            ).value;
+        }
+        function validarDatas(inicio, fim) {
+
+            let hojeData = new Date();
+            hojeData.setHours(0, 0, 0, 0);
+
+            let dataInicio = new Date(inicio);
+            let dataFim = new Date(fim);
+
+            dataInicio.setHours(0, 0, 0, 0);
+            dataFim.setHours(0, 0, 0, 0);
+
+            if (dataInicio < hojeData) {
+                alert("Não é permitido criar eventos em datas passadas.");
+                return false;
+            }
+
+            if (dataFim < dataInicio) {
+                alert("A data final não pode ser menor que a inicial.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function validarHorarios(dataInicio, dataFim, horaInicio, horaFim) {
+
+            if (dataInicio === dataFim && horaFim <= horaInicio) {
+                alert("O horário final não pode ser menor ou igual ao horário inicial no mesmo dia.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function verificarDatas() {
+
+            let eventos = document.querySelectorAll(".evento-card");
+
+            let hojeAtual = new Date();
+            hojeAtual.setHours(0, 0, 0, 0);
+
+            eventos.forEach(function (evento) {
+
+                let dataEvento = evento.getAttribute("data-datafim");
+
+                if (dataEvento) {
+
+                    let data = new Date(dataEvento);
+
+                    if (data < hojeAtual) {
+                        evento.classList.add("evento-passado");
+                    } else {
+                        evento.classList.remove("evento-passado");
+                    }
+                }
+            });
+        }
+
+        function abrirModalEditar(elemento) {
+
+            cardAtual = elemento.parentElement;
+
+            let titulo = cardAtual.querySelectorAll("h1")[0].innerText;
+            let descricao = cardAtual.querySelectorAll("p")[0].innerText;
+            let datas = cardAtual.querySelectorAll("p")[1].innerText;
+            let horarios = cardAtual.querySelectorAll("p")[2].innerText;
+
+            let partesData = datas.split(" até ");
+
+            let dataInicio =
+                partesData[0].trim()
+                    .split("/")
+                    .reverse()
+                    .join("-");
+
+            let dataFim =
+                partesData[1].trim()
+                    .split("/")
+                    .reverse()
+                    .join("-");
+
+            let partesHora = horarios.split(" às ");
+
+            document.getElementById("tituloeditar").value = titulo;
+            document.getElementById("descricaoeditar").value = descricao;
+            document.getElementById("datainicioeditar").value = dataInicio;
+            document.getElementById("datafimeditar").value = dataFim;
+            document.getElementById("horainicioeditar").value = partesHora[0].trim();
+            document.getElementById("horafimeditar").value = partesHora[1].trim();
+
+            document.getElementById("modalEditar").style.display = "flex";
+        }
+
+        function fecharModalEditar() {
+            document.getElementById("modalEditar").style.display = "none";
+        }
+
+        function salvarEvento() {
+
+            let id = cardAtual.getAttribute("data-id");
+
+            let titulo = document.getElementById("tituloeditar").value;
+            let descricao = document.getElementById("descricaoeditar").value;
+            let datainicio = document.getElementById("datainicioeditar").value;
+            let datafim = document.getElementById("datafimeditar").value;
+            let horainicio = document.getElementById("horainicioeditar").value;
+            let horafim = document.getElementById("horafimeditar").value;
+            let imagem = document.getElementById("imagemeditar").files[0];
+
+            if (!validarDatas(datainicio, datafim)) {
+                return;
+            }
+
+            if (!validarHorarios(datainicio, datafim, horainicio, horafim)) {
+                return;
+            }
+
+            let formData = new FormData();
+
+            formData.append("titulo", titulo);
+            formData.append("descricao", descricao);
+            formData.append("data_inicio", datainicio);
+            formData.append("data_fim", datafim);
+            formData.append("hora_inicio", horainicio);
+            formData.append("hora_fim", horafim);
+
+            if (imagem) {
+                formData.append("imagem", imagem);
+            }
+
+            fetch(`/eventos/editar/${id}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data.erro) {
+                        alert(data.erro);
+                        return;
+                    }
+
+                    location.reload();
+
+                });
+
+        }
+
+        function excluirEvento() {
+
+            let id = cardAtual.getAttribute("data-id");
+
+            fetch(`/eventos/excluir/${id}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken()
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data.status === "ok") {
+                        cardAtual.remove();
+                        fecharModalEditar();
+                    }
+
+                });
+
+        }
+
+        function abrirModalAdd() {
+            document.getElementById("modalAdd").style.display = "flex";
+        }
+
+        function fecharModalAdd() {
+            document.getElementById("modalAdd").style.display = "none";
+        }
+
+        function criarEvento(event) {
+
+            event.preventDefault();
+
+            let titulo = document.getElementById("titulocriar").value;
+            let descricao = document.getElementById("descricaocriar").value;
+            let datainicio = document.getElementById("datainiciocriar").value;
+            let datafim = document.getElementById("datafimcriar").value;
+            let horainicio = document.getElementById("horainiciocriar").value;
+            let horafim = document.getElementById("horafimcriar").value;
+            let imagem = document.getElementById("imagemcriar").files[0];
+
+            if (!validarDatas(datainicio, datafim)) {
+                return;
+            }
+
+            if (!validarHorarios(datainicio, datafim, horainicio, horafim)) {
+                return;
+            }
+
+            let formData = new FormData();
+
+            formData.append("titulo", titulo);
+            formData.append("descricao", descricao);
+            formData.append("data_inicio", datainicio);
+            formData.append("data_fim", datafim);
+            formData.append("hora_inicio", horainicio);
+            formData.append("hora_fim", horafim);
+
+            if (imagem) {
+                formData.append("imagem", imagem);
+            }
+
+            fetch("{% url 'criar_evento' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data.erro) {
+                        alert(data.erro);
+                        return;
+                    }
+
+                    location.reload();
+
+                });
+
+        }
+
+        verificarDatas();
+
+    </script>
+
+</body>
+
+</html>
