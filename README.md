@@ -1,74 +1,74 @@
-# Mural Institucional IFRS
+# IFRS Institutional Board
 
-Aplicação web para centralizar a comunicação institucional: avisos, eventos, lembretes, cardápio, provas, próximas aulas, datas importantes e achados e perdidos. Reúne um painel público para consulta e exibição em telas, uma área autenticada de gestão e o Django Admin.
+A web application designed to centralize institutional communication: announcements, events, reminders, cafeteria menus, exams, upcoming classes, important dates, and lost-and-found items. It provides a public information dashboard, an authenticated management area, and Django Admin.
 
 ## Stack
 
-| Camada | Tecnologias |
+| Layer | Technologies |
 | --- | --- |
-| Linguagem | Python; ambiente local validado com Python 3.14 |
-| Backend | Django 6.0.3, views, templates e ORM |
-| Banco | PostgreSQL e psycopg2-binary |
-| Cache | Redis e django-redis 7.0.0 |
-| Controle de requisições | django-ratelimit 4.1.0 com Redis |
-| Interface | HTML, CSS e JavaScript com Django Templates |
-| Configuração | python-decouple e variáveis em `.env` |
-| Arquivos estáticos | Django Staticfiles e middleware WhiteNoise |
-| Integração externa | Open-Meteo, consultada com Requests para informações de clima |
-| Autenticação | Sessões, autenticação e recuperação de senha do Django |
-| Entrada de servidor | WSGI e ASGI; Gunicorn nas dependências para Linux |
+| Language | Python; local environment validated with Python 3.14 |
+| Backend | Django 6.0.3, views, templates, and ORM |
+| Database | PostgreSQL and psycopg2-binary |
+| Cache | Redis and django-redis 7.0.0 |
+| Request Rate Limiting | django-ratelimit 4.1.0 with Redis |
+| Interface | HTML, CSS, and JavaScript with Django Templates |
+| Configuration | python-decouple and `.env` environment variables |
+| Static Files | Django Staticfiles and WhiteNoise middleware |
+| External Integration | Open-Meteo, accessed with Requests for weather information |
+| Authentication | Django sessions, authentication, and password recovery |
+| Server Entry Points | WSGI and ASGI; Gunicorn included in dependencies for Linux |
 
-As versões estão em [`requirements.txt`](requirements.txt). O desenvolvimento local usa Redis diretamente no Windows, sem Docker. As bibliotecas adicionais presentes nas dependências não representam necessariamente funcionalidades ativas.
+Package versions are listed in [`requirements.txt`](requirements.txt). Local development uses Redis directly on Windows, without Docker. Additional libraries included in the dependencies do not necessarily represent active features.
 
-## Funcionalidades
+## Features
 
-- Painel público com informações institucionais e clima.
-- Área autenticada para manutenção de conteúdo e Django Admin.
-- Avisos institucionais, lembretes e informações operacionais.
-- Agenda de eventos e datas importantes.
-- Cardápio e calendário de provas.
-- Consulta de próximas aulas por curso/turma.
-- Cadastro de achados e perdidos com imagens.
-- Recuperação de senha por email.
-- Limitação de requisições em operações como login, uploads e exclusões.
+- Public dashboard with institutional information and weather data.
+- Authenticated area for content management and Django Admin.
+- Institutional announcements, reminders, and operational information.
+- Event calendar and important dates.
+- Cafeteria menu and exam calendar.
+- Upcoming class lookup by course/class group.
+- Lost-and-found item registration with images.
+- Password recovery by email.
+- Request rate limiting for operations such as login, uploads, and deletions.
 
-## Organização
+## Project Structure
 
 ```text
 IFATUALIZADO/
-├── institucional/       # Configurações, URLs, WSGI e ASGI
+├── institucional/       # Settings, URLs, WSGI, and ASGI
 ├── apps/
-│   ├── core/            # Recursos compartilhados e controle de requisições
-│   └── dashboard/       # Modelos e views do mural e da gestão
-├── achadoseperdidos/    # Itens encontrados
-├── avisosinst/          # Avisos institucionais
-├── cardapio/            # Cardápio
-├── datasimport/         # Datas importantes
-├── eventos/            # Eventos
-├── infop/               # Informações operacionais
-├── lembretes/           # Lembretes
-├── provas/              # Calendário de provas
-├── pxaulas/             # Próximas aulas
-├── templates/           # Páginas e templates de email
-├── static/              # CSS, JavaScript e imagens da interface
-├── docs/                # Documentação e referências históricas
-├── .env.example         # Configuração sem credenciais
+│   ├── core/            # Shared resources and request rate limiting
+│   └── dashboard/       # Models and views for the board and management area
+├── achadoseperdidos/    # Lost-and-found items
+├── avisosinst/          # Institutional announcements
+├── cardapio/            # Cafeteria menu
+├── datasimport/         # Important dates
+├── eventos/             # Events
+├── infop/               # Operational information
+├── lembretes/           # Reminders
+├── provas/              # Exam calendar
+├── pxaulas/             # Upcoming classes
+├── templates/           # Pages and email templates
+├── static/              # CSS, JavaScript, and interface images
+├── docs/                # Documentation and historical references
+├── .env.example         # Configuration template without credentials
 ├── manage.py
 ├── requirements.txt
-├── start-redis.ps1      # Inicialização do Redis no Windows
-└── runserver.ps1        # Inicialização do ambiente local
+├── start-redis.ps1      # Redis startup script for Windows
+└── runserver.ps1        # Local environment startup script
 ```
 
-## Pré-requisitos
+## Prerequisites
 
-- Git e Python 3.12 ou superior, compatível com Django 6. Os comandos abaixo usam Python 3.14, validado localmente.
-- PostgreSQL acessível com um esquema compatível com os modelos do projeto.
-- Redis. A configuração local usa `127.0.0.1:6380`, banco Redis `1`.
-- PowerShell para os scripts de inicialização no Windows.
+- Git and Python 3.12 or later, compatible with Django 6. The commands below use Python 3.14, which has been validated locally.
+- PostgreSQL accessible with a schema compatible with the project models.
+- Redis. The local configuration uses `127.0.0.1:6380`, Redis database `1`.
+- PowerShell for the Windows startup scripts.
 
-## Instalação no Windows
+## Installation on Windows
 
-### 1. Clonar e criar a venv
+### 1. Clone the Repository and Create the Virtual Environment
 
 ```powershell
 git clone https://github.com/Kauanzembruski/IFATUALIZADO.git
@@ -77,35 +77,43 @@ py -3.14 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-A ativação é opcional quando os comandos usam o caminho completo do Python. Para ativar: `.\.venv\Scripts\Activate.ps1`.
+Activating the virtual environment is optional when commands use the full Python path. To activate it:
 
-### 2. Configurar o ambiente
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+### 2. Configure the Environment
 
 ```powershell
 Copy-Item .env.example .env
 .\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_urlsafe(50))"
 ```
 
-Copie a chave gerada para `SECRET_KEY` e preencha as credenciais no `.env`.
+Copy the generated key into `SECRET_KEY` and fill in the required credentials in `.env`.
 
-| Variável | Finalidade | Valor local |
+| Variable | Purpose | Local Value |
 | --- | --- | --- |
-| `DEBUG` | Desenvolvimento | `True` |
-| `SECRET_KEY` | Chave do Django | Gere uma chave própria |
-| `ALLOWED_HOSTS` | Hosts separados por vírgula | `localhost,127.0.0.1` |
-| `DB_NAME` | Nome do banco PostgreSQL | Preencher |
-| `DB_USER` | Usuário do banco | Preencher |
-| `DB_PASSWORD` | Senha do banco | Preencher |
-| `DB_HOST` | Endereço do PostgreSQL | `localhost` |
-| `DB_PORT` | Porta do PostgreSQL | `5432` |
-| `REDIS_URL` | Conexão para cache | `redis://127.0.0.1:6380/1` |
-| `EMAIL_BACKEND` | Backend de email | Console no desenvolvimento |
+| `DEBUG` | Development mode | `True` |
+| `SECRET_KEY` | Django secret key | Generate your own key |
+| `ALLOWED_HOSTS` | Comma-separated allowed hosts | `localhost,127.0.0.1` |
+| `DB_NAME` | PostgreSQL database name | Fill in |
+| `DB_USER` | Database user | Fill in |
+| `DB_PASSWORD` | Database password | Fill in |
+| `DB_HOST` | PostgreSQL host | `localhost` |
+| `DB_PORT` | PostgreSQL port | `5432` |
+| `REDIS_URL` | Cache connection | `redis://127.0.0.1:6380/1` |
+| `EMAIL_BACKEND` | Email backend | Console backend in development |
 
-Para SMTP, configure também `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` e, se necessário, `DEFAULT_FROM_EMAIL` e `SERVER_EMAIL`. Com o backend de console, as mensagens de recuperação aparecem no terminal.
+For SMTP, also configure `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, and, if necessary, `DEFAULT_FROM_EMAIL` and `SERVER_EMAIL`.
 
-### 3. Instalar Redis sem Docker
+When using the console email backend, password recovery emails are displayed directly in the terminal.
 
-O script usa a distribuição comunitária [Redis 8.10.2 para Windows x64 Cygwin](https://github.com/redis-windows/redis-windows/releases/tag/8.10.2). Baixe e extraia:
+### 3. Install Redis Without Docker
+
+The script uses the community distribution [Redis 8.10.2 for Windows x64 Cygwin](https://github.com/redis-windows/redis-windows/releases/tag/8.10.2).
+
+Download and extract it:
 
 ```powershell
 New-Item -ItemType Directory -Path tools\redis -Force
@@ -113,7 +121,13 @@ Invoke-WebRequest 'https://github.com/redis-windows/redis-windows/releases/downl
 Expand-Archive tools\redis.zip -DestinationPath tools\redis -Force
 ```
 
-A pasta resultante deve ser `tools\redis\Redis-8.10.2-Windows-x64-cygwin`. Crie nela o arquivo `redis-local.conf` com:
+The resulting folder should be:
+
+```text
+tools\redis\Redis-8.10.2-Windows-x64-cygwin
+```
+
+Create a `redis-local.conf` file inside that directory with:
 
 ```conf
 bind 127.0.0.1
@@ -126,28 +140,46 @@ save ""
 appendonly no
 ```
 
-Inicie e verifique:
+Start Redis and verify that it is working:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\start-redis.ps1
 & .\tools\redis\Redis-8.10.2-Windows-x64-cygwin\redis-cli.exe -p 6380 ping
 ```
 
-O retorno esperado é `PONG`. Redis fica em segundo plano, restrito à máquina local, como cache sem persistência. A porta 6380 evita conflitos com serviços em 6379. Os executáveis não são versionados. Para encerrar:
+The expected response is:
+
+```text
+PONG
+```
+
+Redis runs in the background, restricted to the local machine, and is configured as a non-persistent cache.
+
+Port `6380` is used to avoid conflicts with services running on the default Redis port `6379`.
+
+The Redis executables are not version-controlled.
+
+To stop Redis:
 
 ```powershell
 & .\tools\redis\Redis-8.10.2-Windows-x64-cygwin\redis-cli.exe -p 6380 shutdown
 ```
 
-### 4. Preparar o PostgreSQL
+### 4. Prepare PostgreSQL
 
-O projeto combina modelos gerenciados pelo Django com modelos `managed = False`, associados a tabelas existentes. Portanto, **`migrate` não cria todas as tabelas de negócio**.
+The project combines Django-managed models with `managed = False` models linked to existing database tables.
 
-Disponibilize um esquema PostgreSQL compatível com os modelos atuais antes de usar o painel. Se tiver um backup autorizado, restaure-o separadamente. Dumps e dados reais não são publicados.
+Therefore, **`migrate` does not create all business-related tables**.
 
-`docs/criar_banco_postgresql.txt` é uma referência histórica, não um instalador completo do esquema atual. Contém comandos de exclusão e recriação de banco e tabelas; revise antes de usar e não execute sobre dados que deseja preservar.
+A PostgreSQL schema compatible with the current project models must be available before using the application.
 
-Com o esquema correto e as credenciais preenchidas:
+If you have an authorized database backup, restore it separately. Database dumps and real production data are not included in the repository.
+
+`docs/criar_banco_postgresql.txt` is a historical reference, not a complete installer for the current database schema.
+
+It contains commands for deleting and recreating databases and tables. Review it carefully before using it and never run it against data you want to preserve.
+
+Once the correct schema is available and the credentials are configured:
 
 ```powershell
 .\.venv\Scripts\python.exe manage.py migrate
@@ -155,28 +187,39 @@ Com o esquema correto e as credenciais preenchidas:
 .\.venv\Scripts\python.exe manage.py check
 ```
 
-### 5. Executar
+### 5. Run the Application
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\runserver.ps1
 ```
 
-O script verifica o preenchimento das credenciais, inicia o Redis, executa as verificações do Django e inicia o servidor em `http://127.0.0.1:8000`.
+The script:
 
-| Rota | Área |
+- verifies that the required credentials are configured;
+- starts Redis;
+- runs Django system checks;
+- starts the development server at `http://127.0.0.1:8000`.
+
+| Route | Area |
 | --- | --- |
-| `/` | Painel público |
-| `/home/` | Entrada da área autenticada |
-| `/home/painel/` | Painel de gestão |
+| `/` | Public dashboard |
+| `/home/` | Authenticated area entry point |
+| `/home/painel/` | Management dashboard |
 | `/admin/` | Django Admin |
-| `/home/esqueci-senha/` | Recuperação de senha |
-| `/lembretePublico/` | Tela pública de lembretes |
+| `/home/esqueci-senha/` | Password recovery |
+| `/lembretePublico/` | Public reminders screen |
 
-Para outra porta: `powershell -ExecutionPolicy Bypass -File .\runserver.ps1 -Address 127.0.0.1:8001`.
+To use a different port:
 
-## Linux e macOS
+```powershell
+powershell -ExecutionPolicy Bypass -File .\runserver.ps1 -Address 127.0.0.1:8001
+```
 
-Instale Python, PostgreSQL e Redis no sistema e configure o `.env`. Os scripts `.ps1` são voltados ao Windows; em outros sistemas:
+## Linux and macOS
+
+Install Python, PostgreSQL, and Redis on the system and configure the `.env` file.
+
+The `.ps1` scripts are intended for Windows. On Linux or macOS:
 
 ```bash
 python3 -m venv .venv
@@ -187,24 +230,62 @@ python manage.py migrate
 python manage.py runserver 127.0.0.1:8000
 ```
 
-As dependências incluem pacotes específicos do Windows, como `comtypes`; ajuste-os para o sistema de destino quando necessário. Configure `REDIS_URL` conforme o Redis instalado. A exigência de um esquema PostgreSQL compatível também se aplica.
+The dependencies include Windows-specific packages such as `comtypes`; adjust them as necessary for the target operating system.
 
-## Verificação e estado atual
+Configure `REDIS_URL` according to the installed Redis instance.
+
+The requirement for a PostgreSQL schema compatible with the project also applies.
+
+## Verification and Current Status
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip check
 .\.venv\Scripts\python.exe manage.py check
-.\.venv\Scripts\python.exe manage.py shell -c "from django.core.cache import cache; cache.set('verificacao', 'ok', 30); print(cache.get('verificacao')); cache.delete('verificacao')"
+.\.venv\Scripts\python.exe manage.py shell -c "from django.core.cache import cache; cache.set('verification', 'ok', 30); print(cache.get('verification')); cache.delete('verification')"
 ```
 
-As dependências, as verificações do Django e a escrita/leitura do Redis foram validadas no ambiente local. A execução completa do painel depende do banco configurado e do esquema adequado.
+Dependencies, Django system checks, and Redis read/write operations have been validated in the local environment.
 
-Há testes e documentação legados que precisam de revisão para corresponder ao painel atual. Um teste antigo espera 404 na rota raiz, que atualmente exibe o painel público. Não há declaração de que a suíte completa passe.
+Running the full dashboard requires a properly configured database with the expected schema.
 
-## Arquivos locais e publicação
+There are legacy tests and documentation files that still need to be updated to reflect the current state of the application.
 
-O `.gitignore` exclui ambientes Python, `.env` e variantes locais, dumps SQL, bancos locais, arquivos compactados, chaves privadas, logs, uploads em `media/`, estáticos gerados em `staticfiles/` e executáveis do Redis. `.env.example` contém exemplos e campos vazios.
+One legacy test expects the root route to return `404`, while the root route currently displays the public dashboard.
 
-Os assets de interface em `static/`, templates e migrações fazem parte do código. Imagens enviadas por usuários precisam ser provisionadas separadamente.
+There is currently no claim that the entire test suite passes successfully.
 
-Para produção, configure uma chave própria, `DEBUG=False`, hosts autorizados, HTTPS, servidor WSGI/ASGI, PostgreSQL, Redis e armazenamento de uploads. `runserver` serve ao desenvolvimento. Revise arquivos estáticos, SMTP e configurações de segurança antes de disponibilizar o sistema.
+## Local Files and Deployment
+
+The `.gitignore` excludes:
+
+- Python virtual environments;
+- `.env` and local environment variants;
+- SQL dumps;
+- local databases;
+- compressed files;
+- private keys;
+- logs;
+- user uploads in `media/`;
+- generated static files in `staticfiles/`;
+- Redis executables.
+
+`.env.example` contains sample values and empty fields only.
+
+Interface assets in `static/`, templates, and migrations are included in the repository.
+
+User-uploaded images must be provisioned separately.
+
+For production deployment, configure:
+
+- a unique secret key;
+- `DEBUG=False`;
+- authorized hosts;
+- HTTPS;
+- a WSGI/ASGI server;
+- PostgreSQL;
+- Redis;
+- persistent upload storage.
+
+`runserver` is intended for development only.
+
+Before publishing the application, review the static file configuration, SMTP settings, and security configuration.
