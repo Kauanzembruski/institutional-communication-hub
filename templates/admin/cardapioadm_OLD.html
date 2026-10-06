@@ -1,7 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <title>Cardápio da Semana</title>
@@ -9,27 +8,13 @@
 
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             background: #ffffff;
-            text-align: center;
+            margin: 0;
         }
 
-        table {
-            margin: 20px auto;
-            border-collapse: collapse;
-            width: 60%;
-            background: #eee;
-        }
-
-        th,
-        td {
-            padding: 12px;
-            border: 1px solid #ccc;
-        }
-
-        tr:hover {
-            background: #eee;
-            cursor: pointer;
+        header {
+            width: 100%;
         }
 
         nav {
@@ -46,15 +31,41 @@
             font-weight: bold;
         }
 
-        .pesquisa {
-            width: 300px;
-            padding: 10px;
-            border: none;
-            border-radius: 1px;
-        }
-
         .login {
             width: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 28px;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 60%;
+            background: #eee;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            font-size: 25px;
+            text-align: center;
+        }
+
+        .dia {
+            width: 40%;
+        }
+
+        .lanche {
+            width: 60%;
+        }
+
+        tr:hover {
+            background: #eee;
+            cursor: pointer;
         }
 
         td[contenteditable="true"] {
@@ -66,20 +77,22 @@
         }
 
         .btn-salvar {
-            margin-top: 20px;
+            margin: 50px auto 0 auto;
             padding: 10px 20px;
             border: none;
-            background: #666;
+            background: #a8aab5;
             color: white;
             cursor: pointer;
             border-radius: 5px;
             font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .btn-salvar:hover {
-            background: #555;
+            background: #9699a3;
         }
-
 
         .lanche:empty::before {
             content: "-";
@@ -95,18 +108,27 @@
             color: #666;
             pointer-events: none;
         }
+
+        @media (max-width: 900px) {
+            table {
+                width: 90%;
+            }
+
+            th,
+            td {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 
 <body>
+
     {% csrf_token %}
+
     <header>
         <nav class="inicial">
             <a href="{% url 'painel' %}">Voltar</a>
-
-            <input class="pesquisa" type="text" placeholder="Pesquise aqui...">
-
-            <img class="login" src="{% static 'img/login.png' %}" alt="Usuário">
         </nav>
     </header>
 
@@ -115,8 +137,8 @@
     <table id="tabela">
         <thead>
             <tr>
-                <th>Dia</th>
-                <th>Lanche</th>
+                <th class="dia">Dia</th>
+                <th class="lanche">Lanche</th>
             </tr>
         </thead>
 
@@ -124,8 +146,11 @@
             {% for item in cardapios %}
             <tr data-id="{{ item.id_cardapio }}">
                 <td>{{ item.dia_semana }}</td>
+
                 <td contenteditable="true" class="lanche">
-                    {% if item.lanche and item.lanche != '-' %}{{ item.lanche }}{% endif %}
+                    {% if item.lanche and item.lanche != '-' %}
+                        {{ item.lanche }}
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -137,115 +162,130 @@
     </button>
 
     <script>
-async function salvarCardapio() {
+        async function salvarCardapio() {
 
-    const linhas =
-        document.querySelectorAll("#corpo tr");
+            const linhas =
+                document.querySelectorAll("#corpo tr");
 
-    const itens = [];
+            const itens = [];
 
+            linhas.forEach(linha => {
 
-    linhas.forEach(linha => {
+                const id =
+                    linha.getAttribute("data-id");
 
-        const id =
-            linha.getAttribute("data-id");
+                let lanche =
+                    linha.cells[1].innerText.trim();
 
-        let lanche =
-            linha.cells[1].innerText.trim();
+                if (lanche === "-") {
+                    lanche = "";
+                }
 
+                itens.push({
+                    id: id,
+                    lanche: lanche
+                });
 
-        if (lanche === "-") {
-            lanche = "";
-        }
+            });
 
+            try {
 
-        itens.push({
-            id: id,
-            lanche: lanche
-        });
+                const resposta = await fetch(
+                    "{% url 'salvar_cardapio' %}",
+                    {
+                        method: "POST",
 
-    });
+                        headers: {
+                            "Content-Type":
+                                "application/json",
 
+                            "X-CSRFToken":
+                                getCookie("csrftoken")
+                        },
 
-    try {
+                        body: JSON.stringify({
+                            itens: itens
+                        })
+                    }
+                );
 
-        const resposta = await fetch(
-            "{% url 'salvar_cardapio' %}",
-            {
-                method: "POST",
+                const retorno =
+                    await resposta.json();
 
-                headers: {
-                    "Content-Type":
-                        "application/json",
+                if (!resposta.ok) {
 
-                    "X-CSRFToken":
-                        getCookie("csrftoken")
-                },
+                    console.error(
+                        "Erro retornado:",
+                        retorno
+                    );
 
-                body: JSON.stringify({
-                    itens: itens
-                })
+                    alert(
+                        retorno.erro ||
+                        "Erro ao salvar o cardápio."
+                    );
+
+                    return;
+                }
+
+                alert(
+                    "Cardápio salvo com sucesso!"
+                );
+
+                console.log(
+                    "Cardápio salvo:",
+                    retorno
+                );
+
+            } catch (erro) {
+
+                console.error(
+                    "Erro ao salvar:",
+                    erro
+                );
+
+                alert(
+                    "Erro de comunicação com o servidor."
+                );
+
             }
-        );
-
-
-        const retorno =
-            await resposta.json();
-
-
-        if (!resposta.ok) {
-
-            console.error(
-                "Erro retornado:",
-                retorno
-            );
-
-            alert(
-                retorno.erro ||
-                "Erro ao salvar o cardápio."
-            );
-
-            return;
         }
 
-
-        alert(
-            "Cardápio salvo com sucesso!"
-        );
-
-        console.log(
-            "Cardápio salvo:",
-            retorno
-        );
-
-
-    } catch (erro) {
-
-        console.error(
-            "Erro ao salvar:",
-            erro
-        );
-
-        alert(
-            "Erro de comunicação com o servidor."
-        );
-
-    }
-
-}
         function getCookie(name) {
+
             let cookieValue = null;
 
-            if (document.cookie && document.cookie !== "") {
-                const cookies = document.cookie.split(";");
+            if (
+                document.cookie &&
+                document.cookie !== ""
+            ) {
 
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
+                const cookies =
+                    document.cookie.split(";");
 
-                    if (cookie.substring(0, name.length + 1) === name + "=") {
-                        cookieValue = decodeURIComponent(
-                            cookie.substring(name.length + 1)
-                        );
+                for (
+                    let i = 0;
+                    i < cookies.length;
+                    i++
+                ) {
+
+                    const cookie =
+                        cookies[i].trim();
+
+                    if (
+                        cookie.substring(
+                            0,
+                            name.length + 1
+                        ) ===
+                        name + "="
+                    ) {
+
+                        cookieValue =
+                            decodeURIComponent(
+                                cookie.substring(
+                                    name.length + 1
+                                )
+                            );
+
                         break;
                     }
                 }
@@ -255,29 +295,61 @@ async function salvarCardapio() {
         }
 
         function atualizarPlaceholders() {
-            document.querySelectorAll(".lanche").forEach(td => {
-                if (td.innerText.trim() === "" || td.innerText.trim() === "-") {
-                    td.innerText = "";
-                    td.classList.add("vazio");
-                } else {
-                    td.classList.remove("vazio");
-                }
 
-                td.addEventListener("focus", function () {
-                    this.classList.remove("vazio");
-                });
+            document
+                .querySelectorAll(".lanche")
+                .forEach(td => {
 
-                td.addEventListener("blur", function () {
-                    if (this.innerText.trim() === "") {
-                        this.classList.add("vazio");
+                    if (
+                        td.innerText.trim() === "" ||
+                        td.innerText.trim() === "-"
+                    ) {
+
+                        td.innerText = "";
+                        td.classList.add("vazio");
+
+                    } else {
+
+                        td.classList.remove("vazio");
+
                     }
+
+                    td.addEventListener(
+                        "focus",
+                        function () {
+
+                            this.classList.remove(
+                                "vazio"
+                            );
+
+                        }
+                    );
+
+                    td.addEventListener(
+                        "blur",
+                        function () {
+
+                            if (
+                                this.innerText.trim() === ""
+                            ) {
+
+                                this.classList.add(
+                                    "vazio"
+                                );
+
+                            }
+
+                        }
+                    );
+
                 });
-            });
         }
 
-        window.addEventListener("load", atualizarPlaceholders);
+        window.addEventListener(
+            "load",
+            atualizarPlaceholders
+        );
     </script>
 
 </body>
-
 </html>

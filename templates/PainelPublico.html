@@ -246,6 +246,15 @@
            ANIMAÇÃO DOS AVISOS
         ===================================================== */
 
+        body>footer .marquee p.sem-avisos {
+            width: 100%;
+            padding: 0 15px;
+            text-align: center;
+            white-space: normal;
+            animation: none;
+            will-change: auto;
+        }
+
         @keyframes passarAvisos {
 
             0% {
@@ -404,10 +413,9 @@
              AVISOS INSTITUCIONAIS
         ================================================= -->
 
-        {% if avisos %}
         <div class="marquee">
 
-            <p>
+            <p{% if not avisos %} class="sem-avisos"{% endif %}>
 
                 {% for aviso in avisos %}
 
@@ -421,14 +429,13 @@
 
                 {% empty %}
 
-                *AVISOS INSTITUCIONAIS
+                NAO POSSUEM AVISOS INSTITUCIONAIS
 
                 {% endfor %}
 
             </p>
 
         </div>
-        {% endif %}
 
 
     </footer>
@@ -737,52 +744,64 @@
             intervaloSlide = setTimeout(proximaTela, tempo);
         }
 
-let horaServidor = null;
-let referenciaRelogio = 0;
-let formatoHora = null;
 
-function atualizarHora() {
-    if (horaServidor === null || !formatoHora) return;
+        let horaServidor = null;
+        let referenciaRelogio = 0;
+        let formatoHora = null;
+        let sincronizandoHora = false;
 
-    const decorrido = performance.now() - referenciaRelogio;
-
-    document.getElementById("hora").textContent =
-        formatoHora.format(new Date(horaServidor + decorrido));
-}
-
-async function sincronizarHoraServidor() {
-    try {
-        const resposta = await fetch(
-            "{% url 'horario_servidor' %}",
-            { cache: "no-store" }
-        );
-
-        if (!resposta.ok) {
-            throw new Error(`HTTP ${resposta.status}`);
+        function atualizarHora() {
+            if (horaServidor === null || !formatoHora) return;
+            const decorrido = performance.now() - referenciaRelogio;
+            document.getElementById("hora").textContent = formatoHora.format(
+                new Date(horaServidor + decorrido)
+            );
         }
 
-        const dados = await resposta.json();
+        async function sincronizarHoraServidor() {
+            if (sincronizandoHora) return;
+            sincronizandoHora = true;
+            const controle = new AbortController();
+            const limite = setTimeout(() => controle.abort(), 10000);
+            try {
+                const inicio = performance.now();
+                const resposta = await fetch("{% url 'horario_servidor' %}", {
+                    cache: "no-store",
+                    signal: controle.signal
+                });
+                if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+                const dados = await resposta.json();
+                if (!Number.isFinite(dados.timestamp)) {
+                    throw new Error("Horario do servidor invalido");
+                }
+                const formato = new Intl.DateTimeFormat("pt-BR", {
+                    timeZone: dados.fuso,
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hourCycle: "h23"
+                });
+                const fim = performance.now();
+                // Compensa aproximadamente o tempo de resposta da rede.
+                horaServidor = dados.timestamp + (fim - inicio) / 2;
+                referenciaRelogio = fim;
+                formatoHora = formato;
+                atualizarHora();
+            } catch (erro) {
+                // Mantem a ultima referencia recebida, sem usar o relogio local.
+                console.error("Falha ao sincronizar horario do servidor:", erro);
+            } finally {
+                clearTimeout(limite);
+                sincronizandoHora = false;
+            }
+        }
 
-        const formato = new Intl.DateTimeFormat("pt-BR", {
-            timeZone: dados.fuso,
-            hour: "2-digit",
-            minute: "2-digit",
-            hourCycle: "h23"
+        sincronizarHoraServidor();
+        setInterval(atualizarHora, 1000);
+        setInterval(sincronizarHoraServidor, 60000);
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) sincronizarHoraServidor();
         });
 
-        horaServidor = dados.timestamp;
-        referenciaRelogio = performance.now();
-        formatoHora = formato;
-
-        atualizarHora();
-    } catch (erro) {
-        console.error("Erro ao sincronizar a hora:", erro);
-    }
-}
-
-sincronizarHoraServidor();
-setInterval(atualizarHora, 1000);
-setInterval(sincronizarHoraServidor, 60000);
 
         /* =====================================================
            INICIALIZA TELAS DE AULA

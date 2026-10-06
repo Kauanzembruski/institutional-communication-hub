@@ -143,6 +143,16 @@ def obter_proximas_aulas(curso):
 def tela_horarios(request):
     return render(request, "aulasadm.html")
 
+def anos_equivalentes(ano):
+    """Inclui os valores gravados pelo antigo formulário de horários."""
+    equivalencias = {
+        f"{numero} {tipo}": (f"{numero} {tipo}", f"{numero} Ano/Semestre")
+        for numero in range(1, 4)
+        for tipo in ("Ano", "Semestre")
+    }
+    return equivalencias.get(ano, (ano,))
+
+
 def listar_horarios(request):
 
     curso = request.GET.get("curso")
@@ -153,7 +163,7 @@ def listar_horarios(request):
 
     horarios = HorarioAula.objects.filter(
         curso=curso,
-        ano_semestre=ano,
+        ano_semestre__in=anos_equivalentes(ano),
         turno=turno,
         sala=sala
     )
@@ -205,7 +215,7 @@ def editar_horario(request):
 
         horario = HorarioAula.objects.filter(
             curso=dados["curso"],
-            ano_semestre=dados["ano"],
+            ano_semestre__in=anos_equivalentes(dados["ano"]),
             turma=dados["turma"],
             turno=dados["turno"],
             sala=dados["sala"],
@@ -248,7 +258,7 @@ def excluir_horario(request):
 
         HorarioAula.objects.filter(
             curso=dados["curso"],
-            ano_semestre=dados["ano"],
+            ano_semestre__in=anos_equivalentes(dados["ano"]),
             turma=dados["turma"],
             turno=dados["turno"],
             sala=dados["sala"],

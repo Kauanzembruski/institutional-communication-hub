@@ -217,7 +217,7 @@
         <a href="{% url 'painel' %}">Voltar</a>
     </nav>
 
-    <div class="topo" data-admin-submit="carregarTabela">
+    <div class="topo">
 
         <h2>Gerenciar Horários</h2>
 
@@ -230,14 +230,14 @@
 
         <select id="ano"></select>
 
-        <select id="turma" onchange="carregarTabela()">
+        <select id="turma"  onchange="atualizarFiltrosCurso()">
             <option>A</option>
             <option>B</option>
         </select>
 
         <select id="turno" onchange="carregarTabela()"></select>
 
-        <select id="sala" onchange="carregarTabela()">
+        <select id="sala" onchange="atualizarFiltrosCurso()">
             <option>Sala 1</option>
             <option>Sala 2</option>
             <option>Sala 3</option>
@@ -258,7 +258,6 @@
     </div>
 
     <div class="tabela">
-    <p id="statusTabela" role="status" aria-live="polite"></p>
     <table>
 
         <thead>
@@ -279,7 +278,7 @@
     </div>
 
     <!-- MODAL -->
-    <div class="modal" id="modal" data-admin-close="fecharModal">
+    <div class="modal" id="modal">
 
         <div class="box">
 
@@ -372,7 +371,7 @@
     </div>
 
     <!-- EDIÇÃO -->
-    <div class="modal" id="edicao" data-admin-close="fecharEdicao" data-admin-submit="salvar">
+    <div class="modal" id="edicao">
 
         <div class="box">
 
@@ -560,47 +559,29 @@
             });
         }
 
-        let ultimaCarga = 0;
-
         async function carregarTabela() {
 
-            const carga = ++ultimaCarga;
-            const corpo = document.getElementById("corpo");
-            const status = document.getElementById("statusTabela");
-            const turno = document.getElementById("turno").value;
-            const filtros = new URLSearchParams({
-                curso: document.getElementById("curso").value,
-                ano: document.getElementById("ano").value,
-                turma: document.getElementById("turma").style.display === "none"
-                    ? "" : document.getElementById("turma").value,
-                turno,
-                sala: document.getElementById("sala").value
-            });
+            let url = "{% url 'listar_horarios' %}";
+
+            url += `?curso=${document.getElementById("curso").value}`;
+            url += `&ano=${document.getElementById("ano").value}`;
+            let turmaFiltro = document.getElementById("turma").style.display === "none"
+                ? ""
+                : document.getElementById("turma").value;
+
+            url += `&turma=${turmaFiltro}`;
+            url += `&turno=${document.getElementById("turno").value}`;
+            url += `&sala=${document.getElementById("sala").value}`;
+
+            let resposta = await fetch(url);
+
+            let dados = await resposta.json();
+
+            let corpo = document.getElementById("corpo");
 
             corpo.innerHTML = "";
-            status.textContent = "Carregando horários...";
 
-            let dados;
-            try {
-                const resposta = await fetch(`{% url 'listar_horarios' %}?${filtros}`, {
-                    cache: "no-store",
-                    signal: AbortSignal.timeout(15000)
-                });
-                if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
-                dados = await resposta.json();
-                if (!dados || typeof dados !== "object" || Array.isArray(dados)) {
-                    throw new Error("Resposta de horários inválida");
-                }
-            } catch (erro) {
-                if (carga !== ultimaCarga) return;
-                status.textContent = "Não foi possível carregar os horários. Clique em Carregar para tentar novamente.";
-                console.error("Falha ao carregar horários:", erro);
-                return;
-            }
-
-            if (carga !== ultimaCarga) return;
-            status.textContent = Object.keys(dados).length
-                ? "" : "Nenhuma aula cadastrada para os filtros selecionados.";
+            let turno = document.getElementById("turno").value;
 
             let horarios = [];
 
@@ -785,11 +766,12 @@
 
             atualizarFiltrosCurso();
             atualizarFiltrosNovoCurso();
+
+            carregarTabela();
         };
 
     </script>
 
-<script src="{% static 'js/admin-interacoes.js' %}" defer></script>
 </body>
 
 </html>

@@ -134,7 +134,7 @@
 
     <h1>Cardápio da Semana</h1>
 
-    <table id="tabela">
+    <table id="tabela" data-admin-submit="salvarCardapio">
         <thead>
             <tr>
                 <th class="dia">Dia</th>
@@ -351,5 +351,6 @@
         );
     </script>
 
+<script src="{% static 'js/admin-interacoes.js' %}" defer></script>
 </body>
 </html>

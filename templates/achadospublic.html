@@ -27,15 +27,23 @@
             box-sizing: border-box;
         }
 
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
         header {
             background: #006414;
+            flex-shrink: 0;
         }
 
         main {
             display: block !important;
             width: 100%;
-            height: calc(100vh - 150px);
-            padding: 35px 60px 110px 60px;
+            flex: 1;
+            min-height: 0;
+            margin: 0;
+            padding: 30px 60px;
             overflow: hidden;
         }
 
@@ -43,12 +51,17 @@
             width: 100%;
             height: 100%;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-rows: minmax(0, 1fr);
             gap: 30px;
             overflow: hidden;
         }
 
+        #itensContainer.item-unico {
+            grid-template-columns: minmax(0, 1fr);
+            width: calc((100% - 30px) / 2);
+            margin-inline: auto;
+        }
 
         /* =====================================================
            ITEM
@@ -193,7 +206,7 @@
 
             grid-column: 1 / 3;
 
-            grid-row: 1 / 3;
+            grid-row: 1;
 
             display: flex;
 
@@ -219,6 +232,10 @@
 
             #itensContainer {
                 gap: 20px;
+            }
+
+            #itensContainer.item-unico {
+                width: calc((100% - 20px) / 2);
             }
 
             #itensContainer .item-titulo {
@@ -256,7 +273,7 @@
 
     <main>
 
-        <div id="itensContainer">
+        <div id="itensContainer"{% if itens|length == 1 %} class="item-unico"{% endif %}>
 
 
             {% for item in itens %}
@@ -339,6 +356,9 @@
             // 2. Descobre o índice dos dois itens da página atual
             const primeiroDaDupla = paginaAtual * 2;
             const segundoDaDupla = primeiroDaDupla + 1;
+            document.getElementById('itensContainer').classList.toggle(
+                'item-unico', !itens[segundoDaDupla]
+            );
             // Mostra os itens se eles existirem
             if (itens[primeiroDaDupla]) { itens[primeiroDaDupla].style.display = 'flex'; }
             if (itens[segundoDaDupla]) { itens[segundoDaDupla].style.display = 'flex'; }

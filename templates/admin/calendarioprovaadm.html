@@ -417,7 +417,7 @@ onclick="abrirModal()">
 
 <!-- MODAL NOVA PROVA -->
 
-<section id="modal" class="modal">
+<section id="modal" class="modal" data-admin-close="fecharModal">
 
 <article class="modal-conteudo">
 
@@ -514,7 +514,7 @@ onclick="fecharModal()">
 
 <!-- MODAL EDIÇÃO -->
 
-<section id="editarModal" class="modal">
+<section id="editarModal" class="modal" data-admin-close="fecharEdicao">
 
 <article class="modal-conteudo">
 
@@ -732,7 +732,7 @@ atualizarTurmasEdicao();
 
 {% if messages %}
 
-<div id="modalMensagem" class="modal-mensagem">
+<div id="modalMensagem" class="modal-mensagem" data-admin-close="">
 
 <div class="caixa-mensagem">
 
@@ -754,5 +754,6 @@ OK
 
 {% endif %}
 
+<script src="{% static 'js/admin-interacoes.js' %}" defer></script>
 </body>
 </html>

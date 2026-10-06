@@ -287,7 +287,7 @@ aside .limpar-wrapper {
 <body>
 
 <header>
- <nav class="inicial"> 
+ <nav class="inicial">
     <a href="{% url 'painel' %}">Voltar</a>
 <img class="login"
          src="{% static 'img/login.png' %}"
@@ -310,7 +310,7 @@ aside .limpar-wrapper {
     <input type="radio"
            name="info"
            onclick="abrirEdicao(this)">
-    
+
     <article class="card">
 
       <header class="card-header">
@@ -385,7 +385,7 @@ aside .limpar-wrapper {
 
 </div>
 
-<section id="edicao">
+<section id="edicao" data-admin-close="fecharModalEditar" data-admin-submit="salvar">
 
   <h3>Editar</h3>
 
@@ -418,7 +418,7 @@ aside .limpar-wrapper {
 
 <button class="btn-add" onclick="abrirModal()">+</button>
 
-<section id="modal" class="modal">
+<section id="modal" class="modal" data-admin-close="fecharModal">
 
   <article class="modal-box">
 
@@ -627,7 +627,7 @@ async function criar(e) {
     type="radio"
     name="info"
     onclick="abrirEdicao(this)">
-    
+
     <article class="card">
 
       <header class="card-header">
@@ -689,5 +689,6 @@ bloquearDatasPassadas();
 
 </script>
 
+<script src="{% static 'js/admin-interacoes.js' %}" defer></script>
 </body>
 </html>

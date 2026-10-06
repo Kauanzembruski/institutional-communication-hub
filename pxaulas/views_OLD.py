@@ -44,6 +44,10 @@ def pxaulas_publico(request, curso):
 
 
 def proximas_aulas(request, curso):
+    return JsonResponse(obter_proximas_aulas(curso))
+
+
+def obter_proximas_aulas(curso):
 
     agora = datetime.now()
 
@@ -104,10 +108,10 @@ def proximas_aulas(request, curso):
 
     if not proximo_inicio:
 
-        return JsonResponse({
+        return {
             "horario": None,
             "dados": []
-        })
+        }
 
 
     aulas = HorarioAula.objects.filter(
@@ -131,10 +135,10 @@ def proximas_aulas(request, curso):
         })
 
 
-    return JsonResponse({
+    return {
         "horario": f"{proximo_inicio} - {proximo_fim}",
         "dados": dados
-    })
+    }
 
 def tela_horarios(request):
     return render(request, "aulasadm.html")

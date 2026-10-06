@@ -278,56 +278,68 @@
 
         <!-- INFORMAÇÕES OPERACIONAIS -->
 
+        {% if tem_infos %}
         <section class="tela">
 
             <iframe src="{% url 'info_publico' %}"></iframe>
 
         </section>
+        {% endif %}
 
 
         <!-- EVENTOS -->
 
+        {% if tem_eventos %}
         <section class="tela">
 
             <iframe src="{% url 'eventos_publico' %}"></iframe>
 
         </section>
+        {% endif %}
 
 
         <!-- CALENDÁRIO -->
 
+        {% if tem_calendario %}
         <section class="tela">
 
-            <iframe src="{% url 'calendario_publico' %}"></iframe>
+            <iframe src="{% url 'calendario_publico' %}?quinzena={{ quinzena }}"></iframe>
 
         </section>
+        {% endif %}
 
 
         <!-- ACHADOS E PERDIDOS -->
 
+        {% if tem_achados %}
         <section class="tela">
 
-            <iframe src="{% url 'achados_publico' %}"></iframe>
+            <iframe src="{% url 'achados_publico' %}?ciclo={{ ciclo|stringformat:'d' }}"></iframe>
 
         </section>
+        {% endif %}
 
 
         <!-- CARDÁPIO -->
 
+        {% if tem_cardapio %}
         <section class="tela">
 
             <iframe src="{% url 'cardapio_tv' %}"></iframe>
 
         </section>
+        {% endif %}
 
 
         <!-- LEMBRETES -->
 
+        {% if tem_lembretes %}
         <section class="tela">
 
             <iframe src="{% url 'tv' %}"></iframe>
 
         </section>
+        {% endif %}
 
 
     </div>
@@ -382,7 +394,7 @@
 
             <!-- HORA -->
 
-            <span id="hora"></span>
+            <span id="hora">--:--</span>
 
 
         </div>
@@ -392,6 +404,7 @@
              AVISOS INSTITUCIONAIS
         ================================================= -->
 
+        {% if avisos %}
         <div class="marquee">
 
             <p>
@@ -415,6 +428,7 @@
             </p>
 
         </div>
+        {% endif %}
 
 
     </footer>
@@ -616,6 +630,7 @@
             if (turno === "dia") {
 
 
+                {% if tem_aulas_tii %}
                 slider.appendChild(
 
                     criarTela(
@@ -623,8 +638,10 @@
                     )
 
                 );
+                {% endif %}
 
 
+                {% if tem_aulas_adm %}
                 slider.appendChild(
 
                     criarTela(
@@ -632,6 +649,7 @@
                     )
 
                 );
+                {% endif %}
 
 
             }
@@ -648,6 +666,7 @@
             ) {
 
 
+                {% if tem_aulas_ads %}
                 slider.appendChild(
 
                     criarTela(
@@ -655,8 +674,10 @@
                     )
 
                 );
+                {% endif %}
 
 
+                {% if tem_aulas_tpg %}
                 slider.appendChild(
 
                     criarTela(
@@ -664,6 +685,7 @@
                     )
 
                 );
+                {% endif %}
 
 
             }
@@ -678,291 +700,97 @@
            REINICIA O SLIDER
         ===================================================== */
 
+        function avancarCiclo() {
+            const url = new URL(window.location.href);
+            const ciclo = Number("{{ ciclo|stringformat:'d' }}");
+            url.searchParams.set("ciclo", String(ciclo + 1));
+            window.location.replace(url.toString());
+        }
+
         function reiniciarSlider() {
-
-
-            /*
-            LIMPA INTERVALO ANTIGO
-            */
-
-            if (intervaloSlide) {
-
-                clearInterval(
-                    intervaloSlide
-                );
-
-            }
-
-
-            /*
-            REMOVE CLONES ANTIGOS
-            */
-
-            document
-                .querySelectorAll(
-                    ".clone"
-                )
-                .forEach(
-                    clone => clone.remove()
-                );
-
-
-            /*
-            PEGA TODAS AS TELAS
-            */
-
-            const slides =
-                document.querySelectorAll(
-                    ".tela"
-                );
-
-
-            if (
-                slides.length === 0
-            ) {
-
-                return;
-
-            }
-
-
-            /*
-            CRIA CLONE DA PRIMEIRA TELA
-            PARA DEIXAR A TRANSIÇÃO CONTÍNUA
-            */
-
-            const primeiroClone =
-                slides[0].cloneNode(
-                    true
-                );
-
-
-            primeiroClone.classList.add(
-                "clone"
-            );
-
-
-            slider.appendChild(
-                primeiroClone
-            );
-
-
-            /*
-            VOLTA PARA PRIMEIRA TELA
-            */
-
+            clearTimeout(intervaloSlide);
+            const slides = slider.querySelectorAll(".tela");
             atual = 0;
+            slider.style.transition = "none";
+            slider.style.transform = "translateX(0vw)";
 
-
-            slider.style.transition =
-                "none";
-
-
-            slider.style.transform =
-                "translateX(0vw)";
-
-
-            setTimeout(() => {
-
-                slider.style.transition =
-                    "transform 1s ease-in-out";
-
-            }, 50);
-
-
-            /*
-            TOTAL DE SLIDES
-            INCLUINDO CLONE
-            */
-
-            const total =
-                document.querySelectorAll(
-                    ".tela"
-                ).length;
-
-
-            /*
-            INICIA SLIDER
-            */
-
-            intervaloSlide =
-                setInterval(() => {
-
-
-                    atual++;
-
-
-                    slider.style.transition =
-                        "transform 1s ease-in-out";
-
-
-                    slider.style.transform =
-                        `translateX(-${atual * 100}vw)`;
-
-
-                    /*
-                    CHEGOU NO CLONE
-                    */
-
-                    if (
-                        atual === total - 1
-                    ) {
-
-
-                        setTimeout(() => {
-
-
-                            slider.style.transition =
-                                "none";
-
-
-                            atual = 0;
-
-
-                            slider.style.transform =
-                                "translateX(0vw)";
-
-
-                            /*
-                            RESTAURA A ANIMAÇÃO
-                            */
-
-                            setTimeout(() => {
-
-                                slider.style.transition =
-                                    "transform 1s ease-in-out";
-
-                            }, 50);
-
-
-                        }, 1000);
-
-                    }
-
-
-                }, tempo);
-
-        }
-
-
-        /* =====================================================
-           ATUALIZA A HORA
-        ===================================================== */
-
-        function atualizarHora() {
-
-            const agora =
-                new Date();
-
-
-            const elementoHora =
-                document.getElementById(
-                    "hora"
-                );
-
-
-            if (!elementoHora) {
-
+            // Sem telas, procura novos cadastros ap?s um minuto.
+            if (slides.length === 0) {
+                intervaloSlide = setTimeout(() => window.location.reload(), 60000);
                 return;
-
             }
 
+            function proximaTela() {
+                // A ?ltima tela j? ficou vis?vel pelo tempo completo.
+                if (atual + 1 >= slides.length) {
+                    avancarCiclo();
+                    return;
+                }
+                atual++;
+                slider.style.transition = "transform 1s ease-in-out";
+                slider.style.transform = `translateX(-${atual * 100}vw)`;
+                // Inclui a transi??o para garantir cinco segundos de leitura.
+                intervaloSlide = setTimeout(proximaTela, tempo + 1000);
+            }
 
-            elementoHora.innerHTML =
-
-                agora.toLocaleTimeString(
-
-                    "pt-BR",
-
-                    {
-
-                        hour:
-                            "2-digit",
-
-                        minute:
-                            "2-digit"
-
-                    }
-
-                );
-
+            // Tamb?m avan?a a p?gina quando h? somente uma tela dispon?vel.
+            intervaloSlide = setTimeout(proximaTela, tempo);
         }
 
+let horaServidor = null;
+let referenciaRelogio = 0;
+let formatoHora = null;
 
-        setInterval(
-            atualizarHora,
-            1000
+function atualizarHora() {
+    if (horaServidor === null || !formatoHora) return;
+
+    const decorrido = performance.now() - referenciaRelogio;
+
+    document.getElementById("hora").textContent =
+        formatoHora.format(new Date(horaServidor + decorrido));
+}
+
+async function sincronizarHoraServidor() {
+    try {
+        const resposta = await fetch(
+            "{% url 'horario_servidor' %}",
+            { cache: "no-store" }
         );
 
+        if (!resposta.ok) {
+            throw new Error(`HTTP ${resposta.status}`);
+        }
+
+        const dados = await resposta.json();
+
+        const formato = new Intl.DateTimeFormat("pt-BR", {
+            timeZone: dados.fuso,
+            hour: "2-digit",
+            minute: "2-digit",
+            hourCycle: "h23"
+        });
+
+        horaServidor = dados.timestamp;
+        referenciaRelogio = performance.now();
+        formatoHora = formato;
 
         atualizarHora();
+    } catch (erro) {
+        console.error("Erro ao sincronizar a hora:", erro);
+    }
+}
 
+sincronizarHoraServidor();
+setInterval(atualizarHora, 1000);
+setInterval(sincronizarHoraServidor, 60000);
 
         /* =====================================================
            INICIALIZA TELAS DE AULA
         ===================================================== */
 
-        montarTelasAulas();
-
-
-        /* =====================================================
-           ATUALIZA O TURNO A CADA MINUTO
-        ===================================================== */
-
-        setInterval(
-
-            montarTelasAulas,
-
-            60000
-
-        );
-
-
-        /* =====================================================
-           RECARREGA OS IFRAMES
-        ===================================================== */
-
-        setInterval(() => {
-
-
-            document
-                .querySelectorAll(
-                    "iframe"
-                )
-                .forEach(
-                    frame => {
-
-
-                        try {
-
-
-                            frame.contentWindow
-                                .location
-                                .reload();
-
-
-                        }
-
-                        catch (erro) {
-
-
-                            console.log(
-
-                                "Não foi possível recarregar iframe:",
-
-                                erro
-
-                            );
-
-
-                        }
-
-
-                    }
-                );
-
-
-        }, 60000);
+        // Aguarda o conte?do inicial antes de iniciar a contagem.
+        window.addEventListener("load", montarTelasAulas);
+        // Dados e turnos s?o reavaliados no pr?ximo ciclo, sem interromper este.
 
 
     </script>
